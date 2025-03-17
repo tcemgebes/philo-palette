@@ -22,7 +22,8 @@ export default {
 			fontFamily: {
 				sans: ['Inter var', 'sans-serif'],
 				serif: ['Freight Text Pro', 'Georgia', 'serif'],
-				mono: ['SF Mono', 'monospace'],
+				mono: ['VT323', 'SF Mono', 'monospace'],
+				pixel: ['Press Start 2P', 'cursive'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -67,7 +68,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// New retro game-inspired colors
+				retro: {
+					black: '#1a1207',
+					gold: '#e8da99',
+					sand: '#c3b17f',
+					red: '#e83b3b',
+					blue: '#2a4261',
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

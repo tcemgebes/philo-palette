@@ -1,5 +1,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,83 +9,85 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 220 20% 10%;
+    --background: 42 35% 7%;
+    --foreground: 48 47% 75%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 10%;
+    --card: 0 0% 0%;
+    --card-foreground: 48 47% 75%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 10%;
+    --popover: 42 35% 7%;
+    --popover-foreground: 48 47% 75%;
 
-    --primary: 220 40% 15%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 48 47% 75%;
+    --primary-foreground: 42 35% 7%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 220 40% 15%;
+    --secondary: 47 30% 60%;
+    --secondary-foreground: 42 35% 7%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 220 10% 40%;
+    --muted: 47 20% 20%;
+    --muted-foreground: 48 30% 60%;
 
-    --accent: 240 30% 50%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 0 60% 57%;
+    --accent-foreground: 48 47% 75%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 48 47% 75%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 220 40% 15%;
+    --border: 47 30% 60%;
+    --input: 47 30% 60%;
+    --ring: 48 47% 75%;
 
-    --radius: 0.5rem;
+    --radius: 0;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 42 40% 10%;
+    --sidebar-foreground: 48 47% 75%;
+    --sidebar-primary: 48 47% 75%;
+    --sidebar-primary-foreground: 42 35% 7%;
+    --sidebar-accent: 47 30% 60%;
+    --sidebar-accent-foreground: 42 35% 7%;
+    --sidebar-border: 47 30% 60%;
+    --sidebar-ring: 48 40% 70%;
   }
 
   .dark {
-    --background: 220, 20%, 4%;
-    --foreground: 210 40% 98%;
+    /* We're implementing a retro game style that's already dark, 
+       so we'll use the same values for dark mode */
+    --background: 42 35% 7%;
+    --foreground: 48 47% 75%;
 
-    --card: 220 20% 8%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 0%;
+    --card-foreground: 48 47% 75%;
 
-    --popover: 220 20% 8%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 42 35% 7%;
+    --popover-foreground: 48 47% 75%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 220 40% 15%;
+    --primary: 48 47% 75%;
+    --primary-foreground: 42 35% 7%;
 
-    --secondary: 215 25% 12%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 47 30% 60%;
+    --secondary-foreground: 42 35% 7%;
 
-    --muted: 215 25% 12%;
-    --muted-foreground: 210 20% 80%;
+    --muted: 47 20% 20%;
+    --muted-foreground: 48 30% 60%;
 
-    --accent: 240 30% 60%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 0 60% 57%;
+    --accent-foreground: 48 47% 75%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 48 47% 75%;
 
-    --border: 215 25% 12%;
-    --input: 215 25% 12%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 47 30% 60%;
+    --input: 47 30% 60%;
+    --ring: 48 47% 75%;
     
-    --sidebar-background: 220 20% 8%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 210 40% 98%;
-    --sidebar-primary-foreground: 220 40% 15%;
-    --sidebar-accent: 215 25% 12%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 215 25% 12%;
-    --sidebar-ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 42 40% 10%;
+    --sidebar-foreground: 48 47% 75%;
+    --sidebar-primary: 48 47% 75%;
+    --sidebar-primary-foreground: 42 35% 7%;
+    --sidebar-accent: 47 30% 60%;
+    --sidebar-accent-foreground: 42 35% 7%;
+    --sidebar-border: 47 30% 60%;
+    --sidebar-ring: 48 40% 70%;
   }
 }
 
@@ -97,8 +101,32 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  /* New retro-style classes */
+  .retro-container {
+    @apply bg-[#1a1207] text-[#e8da99] border-2 border-[#c3b17f] p-4;
+  }
+
+  .retro-text {
+    @apply font-mono text-[#e8da99] tracking-wider;
+  }
+
+  .retro-title {
+    @apply font-pixel text-[#e8da99] tracking-widest uppercase;
+  }
+
+  .retro-button {
+    @apply font-mono text-[#e8da99] border border-[#c3b17f] px-4 py-2 
+           hover:bg-[#c3b17f]/20 transition-colors uppercase tracking-wider;
+  }
+
+  .retro-input {
+    @apply bg-black border border-[#c3b17f] text-[#e8da99] font-mono p-2 
+           focus:outline-none focus:ring-1 focus:ring-[#e8da99];
+  }
+
+  /* Keep existing utility classes */
   .glass-panel {
-    @apply bg-white/70 dark:bg-black/70 backdrop-blur-md rounded-lg border border-white/20 dark:border-black/20 shadow-lg;
+    @apply bg-black/80 backdrop-blur-sm border border-[#c3b17f] shadow-lg;
   }
 
   .page-container {
@@ -106,35 +134,38 @@
   }
 
   .heading-xl {
-    @apply text-4xl sm:text-5xl md:text-6xl font-light tracking-tight text-primary;
+    @apply text-4xl sm:text-5xl md:text-6xl font-mono tracking-wide text-[#e8da99];
   }
 
   .heading-lg {
-    @apply text-3xl sm:text-4xl md:text-5xl font-light tracking-tight text-primary;
+    @apply text-3xl sm:text-4xl md:text-5xl font-mono tracking-wide text-[#e8da99];
   }
 
   .heading-md {
-    @apply text-2xl sm:text-3xl font-light tracking-tight text-primary;
+    @apply text-2xl sm:text-3xl font-mono tracking-wide text-[#e8da99];
   }
 
   .body-text {
-    @apply text-base md:text-lg leading-relaxed text-foreground/90;
+    @apply text-base md:text-lg leading-relaxed text-[#e8da99]/90 font-mono;
   }
 
   .subtle-text {
-    @apply text-sm text-muted-foreground;
+    @apply text-sm text-[#c3b17f] font-mono;
   }
 
   .btn-primary {
-    @apply px-6 py-3 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-300 font-medium;
+    @apply px-6 py-3 border border-[#c3b17f] bg-transparent text-[#e8da99] hover:bg-[#c3b17f]/20 
+           transition-all duration-300 font-mono uppercase tracking-wider;
   }
 
   .btn-secondary {
-    @apply px-6 py-3 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-all duration-300 font-medium;
+    @apply px-6 py-3 bg-[#1a1207] text-[#e8da99] border border-[#c3b17f]/50 
+           hover:border-[#c3b17f] transition-all duration-300 font-mono uppercase tracking-wider;
   }
 
   .btn-accent {
-    @apply px-6 py-3 rounded-md bg-accent text-accent-foreground hover:bg-accent/90 transition-all duration-300 font-medium;
+    @apply px-6 py-3 bg-[#e83b3b]/80 text-[#e8da99] border border-[#e83b3b] 
+           hover:bg-[#e83b3b] transition-all duration-300 font-mono uppercase tracking-wider;
   }
 }
 
