@@ -1,11 +1,9 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { ArrowRight, Book, Brain, Lightbulb, Scroll } from 'lucide-react';
-import { motion } from '@motionone/dom';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -24,11 +22,8 @@ const Index = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-background z-0" />
           
           <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: 'easeOut' }}
-              className="max-w-3xl mx-auto space-y-6"
+            <div
+              className="max-w-3xl mx-auto space-y-6 animate-fade-in"
             >
               <span className="inline-block px-3 py-1 text-xs font-medium text-accent bg-accent/10 rounded-full">
                 Discover Your Philosophical Path
@@ -49,7 +44,7 @@ const Index = () => {
                 <span>Begin Your Journey</span>
                 <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </Button>
-            </motion.div>
+            </div>
           </div>
           
           {/* Decorative Elements */}

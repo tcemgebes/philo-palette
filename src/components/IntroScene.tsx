@@ -1,7 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Motion, Presence } from '@motionone/dom';
 import { cn } from '@/lib/utils';
 
 const INTRO_SCENES = [
@@ -41,7 +39,6 @@ const IntroScene: React.FC = () => {
           setIsTransitioning(false);
         }, 1000);
       } else {
-        // Last scene, prepare to navigate
         setIsTransitioning(true);
         setTimeout(() => {
           navigate('/introspection');
@@ -59,12 +56,10 @@ const IntroScene: React.FC = () => {
     }, 1000);
   };
 
-  // Placeholder images for development
   const placeholderImage = "https://images.unsplash.com/photo-1531959870249-9f9b729efcf4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80";
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-black">
-      {/* Background image */}
       <div 
         className={cn(
           "absolute inset-0 bg-cover bg-center transition-opacity duration-2000",
@@ -75,7 +70,6 @@ const IntroScene: React.FC = () => {
         }}
       />
       
-      {/* Text overlay */}
       <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
         <div 
           className={cn(

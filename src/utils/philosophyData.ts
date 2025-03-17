@@ -1,4 +1,3 @@
-
 export interface Philosopher {
   id: string;
   name: string;
@@ -28,6 +27,7 @@ export interface Book {
   affiliateLink: string;
   movement: string;
   profile: PhilosopherProfile;
+  matchPercentage?: number;  // Adding this optional property
 }
 
 export interface QuizQuestion {
