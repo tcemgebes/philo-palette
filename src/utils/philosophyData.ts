@@ -203,7 +203,7 @@ export const quizQuestions: QuizQuestion[] = [
       },
       {
         value: 'c',
-        label: 'I'm skeptical of new ideas until they prove their worth',
+        label: "I'm skeptical of new ideas until they prove their worth",
         trait: 'openness',
         score: 30
       },
@@ -347,7 +347,7 @@ export const quizQuestions: QuizQuestion[] = [
       },
       {
         value: 'b',
-        label: 'We're largely responsible for our choices, though circumstances play a role',
+        label: "We're largely responsible for our choices, though circumstances play a role",
         trait: 'conscientiousness',
         score: 70
       },
@@ -359,7 +359,7 @@ export const quizQuestions: QuizQuestion[] = [
       },
       {
         value: 'd',
-        label: 'Free will is largely an illusion; we're products of forces beyond our control',
+        label: 'Free will is largely an illusion; we\'re products of forces beyond our control',
         trait: 'conscientiousness',
         score: 10
       }
