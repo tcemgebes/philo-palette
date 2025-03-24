@@ -5,10 +5,11 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PhilosophyBook from '@/components/PhilosophyBook';
 import DonationModal from '@/components/DonationModal';
+import BookDatabaseStatus from '@/components/BookDatabaseStatus';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { UserProfile, Book, getRecommendations, extractContextsFromText } from '@/utils/philosophyData';
-import { ArrowLeft, Share2, Heart, BookOpen, Bookmark, Download } from 'lucide-react';
+import { UserProfile, Book, getRecommendations, extractContextsFromText, initializeBookDatabase } from '@/utils/philosophyData';
+import { ArrowLeft, Share2, Heart, BookOpen, Bookmark, Download, RotateCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const Results = () => {
@@ -17,6 +18,7 @@ const Results = () => {
   const [showDonationModal, setShowDonationModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showPublicDomain, setShowPublicDomain] = useState(false);
+  const [filterMode, setFilterMode] = useState<'all' | 'publicDomain' | 'modern'>('all');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,28 +29,61 @@ const Results = () => {
       return;
     }
 
-    // Show loading state briefly
+    // Show loading state
     setLoading(true);
     
-    // Simulate API call with timeout
+    // Initialize book database first, then generate recommendations
+    initializeBookDatabase()
+      .then(() => {
+        try {
+          const profile = JSON.parse(userProfileString) as UserProfile;
+          setUserProfile(profile);
+          const matchedBooks = getRecommendations(profile, 12); // Increase to 12 books
+          setRecommendations(matchedBooks);
+        } catch (error) {
+          console.error('Error calculating recommendations:', error);
+        } finally {
+          setLoading(false);
+          
+          // Show donation modal after a delay
+          setTimeout(() => {
+            setShowDonationModal(true);
+          }, 15000);
+        }
+      })
+      .catch(error => {
+        console.error('Error initializing book database:', error);
+        setLoading(false);
+      });
+  }, [navigate]);
+
+  const regenerateRecommendations = () => {
+    if (!userProfile) return;
+    
+    setLoading(true);
+    
+    // Simulate loading
     setTimeout(() => {
       try {
-        const profile = JSON.parse(userProfileString) as UserProfile;
-        setUserProfile(profile);
-        const matchedBooks = getRecommendations(profile, 6);
+        // Create a slightly modified profile to get different recommendations
+        const modifiedProfile = {
+          ...userProfile,
+          personalityTraits: {
+            ...userProfile.personalityTraits,
+            // Slightly modify a trait to get different but still relevant recommendations
+            openness: Math.min(100, Math.max(0, (userProfile.personalityTraits.openness || 50) + (Math.random() * 20 - 10)))
+          }
+        };
+        
+        const matchedBooks = getRecommendations(modifiedProfile, 12);
         setRecommendations(matchedBooks);
       } catch (error) {
-        console.error('Error calculating recommendations:', error);
+        console.error('Error regenerating recommendations:', error);
       } finally {
         setLoading(false);
-        
-        // Show donation modal after a delay
-        setTimeout(() => {
-          setShowDonationModal(true);
-        }, 15000);
       }
-    }, 1500);
-  }, [navigate]);
+    }, 1000);
+  };
 
   const restartJourney = () => {
     navigate('/');
@@ -95,11 +130,24 @@ const Results = () => {
 
   const getContextKeywords = () => {
     if (!userProfile) return [];
-    return extractContextsFromText(userProfile.introspectionText);
+    return userProfile.enhancedProfile?.extractedContexts || 
+           extractContextsFromText(userProfile.introspectionText);
+  };
+
+  const getFilteredBooks = () => {
+    switch (filterMode) {
+      case 'publicDomain':
+        return recommendations.filter(book => book.isPublicDomain);
+      case 'modern':
+        return recommendations.filter(book => !book.isPublicDomain);
+      default:
+        return recommendations;
+    }
   };
 
   const dominantPhilosophy = getDominantPhilosophy();
   const contextKeywords = getContextKeywords();
+  const filteredBooks = getFilteredBooks();
   
   // Skeleton loading state
   if (loading) {
@@ -157,71 +205,118 @@ const Results = () => {
               )}
             </div>
             
-            <Card className="p-6 bg-retro-black/50 border border-retro-sand/30 mb-8">
-              <h2 className="font-mono text-xl text-retro-gold mb-3">Your Philosophical Profile</h2>
-              
-              {contextKeywords.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="font-mono text-sm text-retro-sand mb-2">Key themes from your introspection:</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {contextKeywords.map((keyword, index) => (
-                      <span 
-                        key={index} 
-                        className="px-2 py-1 bg-retro-black border border-retro-sand/50 text-retro-gold text-xs font-mono"
-                      >
-                        {keyword}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              <p className="font-mono text-sm text-retro-sand mb-4">
-                Based on your responses, we've identified philosophical works that {userProfile?.wantsContrast ? 'challenge' : 'align with'} your perspective. 
-                These books offer insights that may resonate with your current situation.
-              </p>
-              
-              <div className="flex justify-end">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowPublicDomain(!showPublicDomain)}
-                  className="font-mono text-xs border-retro-sand text-retro-sand hover:text-retro-gold hover:bg-retro-black/50 rounded-none"
-                >
-                  {showPublicDomain ? (
-                    <>Show Paid Books</>
-                  ) : (
-                    <>Show Public Domain Works</>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <div className="md:col-span-3">
+                <Card className="p-6 bg-retro-black/50 border border-retro-sand/30">
+                  <h2 className="font-mono text-xl text-retro-gold mb-3">Your Philosophical Profile</h2>
+                  
+                  {contextKeywords.length > 0 && (
+                    <div className="mb-4">
+                      <h3 className="font-mono text-sm text-retro-sand mb-2">Key themes from your introspection:</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {contextKeywords.slice(0, 8).map((keyword, index) => (
+                          <span 
+                            key={index} 
+                            className="px-2 py-1 bg-retro-black border border-retro-sand/50 text-retro-gold text-xs font-mono"
+                          >
+                            {keyword}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   )}
-                </Button>
+                  
+                  <p className="font-mono text-sm text-retro-sand mb-4">
+                    Based on your responses, we've identified philosophical works that 
+                    {userProfile?.wantsContrast ? ' challenge' : ' align with'} your perspective. 
+                    These books offer insights that may resonate with your current situation and personality variations.
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setFilterMode('all')}
+                      className={cn(
+                        "font-mono text-xs border-retro-sand rounded-none",
+                        filterMode === 'all' 
+                          ? "bg-retro-gold text-retro-black hover:bg-retro-sand border-retro-gold" 
+                          : "text-retro-sand hover:text-retro-gold hover:bg-retro-black/50"
+                      )}
+                    >
+                      All Books
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setFilterMode('publicDomain')}
+                      className={cn(
+                        "font-mono text-xs border-retro-sand rounded-none",
+                        filterMode === 'publicDomain' 
+                          ? "bg-retro-gold text-retro-black hover:bg-retro-sand border-retro-gold" 
+                          : "text-retro-sand hover:text-retro-gold hover:bg-retro-black/50"
+                      )}
+                    >
+                      Free Public Domain
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setFilterMode('modern')}
+                      className={cn(
+                        "font-mono text-xs border-retro-sand rounded-none",
+                        filterMode === 'modern' 
+                          ? "bg-retro-gold text-retro-black hover:bg-retro-sand border-retro-gold" 
+                          : "text-retro-sand hover:text-retro-gold hover:bg-retro-black/50"
+                      )}
+                    >
+                      Modern Works
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={regenerateRecommendations}
+                      className="font-mono text-xs border-retro-sand text-retro-sand hover:text-retro-gold hover:bg-retro-black/50 rounded-none ml-auto"
+                    >
+                      <RotateCw size={14} className="mr-1" />
+                      Refresh Results
+                    </Button>
+                  </div>
+                </Card>
               </div>
-            </Card>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {recommendations
-                .filter(book => showPublicDomain ? book.isPublicDomain : true)
-                .map((book) => (
-                  <PhilosophyBook
-                    key={book.id}
-                    title={book.title}
-                    author={book.author}
-                    description={book.description}
-                    shortSummary={book.shortSummary}
-                    matchPercentage={book.matchPercentage || 0}
-                    coverImage={book.coverImage}
-                    affiliateLink={book.affiliateLink}
-                    publicDomainLink={book.publicDomainLink}
-                    year={book.year}
-                    philosophy={book.movement}
-                    isPublicDomain={book.isPublicDomain}
-                    era={book.era}
-                    context={book.contextRespondedTo?.join(', ')}
-                  />
-                ))}
+              
+              <div className="md:col-span-1">
+                <BookDatabaseStatus />
+              </div>
             </div>
             
-            {recommendations.length === 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredBooks.map((book) => (
+                <PhilosophyBook
+                  key={book.id}
+                  title={book.title}
+                  author={book.author}
+                  description={book.description}
+                  shortSummary={book.shortSummary}
+                  matchPercentage={book.matchPercentage || 0}
+                  coverImage={book.coverImage}
+                  affiliateLink={book.affiliateLink}
+                  publicDomainLink={book.publicDomainLink}
+                  year={book.year}
+                  philosophy={book.movement}
+                  isPublicDomain={book.isPublicDomain}
+                  era={book.era}
+                  context={book.contextRespondedTo?.join(', ')}
+                />
+              ))}
+            </div>
+            
+            {filteredBooks.length === 0 && (
               <div className="text-center p-12 border border-retro-sand/30">
-                <p className="text-retro-gold font-mono">No matching books found. Please try again with different responses.</p>
+                <p className="text-retro-gold font-mono">No matching books found. Please try again with different responses or try a different filter.</p>
               </div>
             )}
             

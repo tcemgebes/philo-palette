@@ -42,12 +42,23 @@ export interface Book {
   source?: 'manual' | 'gutenberg' | 'other'; // Source of the book data
 }
 
+export interface EnhancedUserProfile {
+  currentChallenges: string;
+  personalityVariability: string;
+  lifeBackground: string;
+  seekingType: 'practical' | 'theoretical' | 'both';
+  preferenceType: 'align' | 'contrast' | 'both';
+  personalityTraits?: Partial<PhilosopherProfile>;
+  extractedContexts?: string[];
+}
+
 export interface UserProfile {
   introspectionText: string;
   wantsContrast: boolean;
   environment: string;
   experienceWithPhilosophy: 'beginner' | 'intermediate' | 'advanced';
   personalityTraits: Partial<PhilosopherProfile>;
+  enhancedProfile?: EnhancedUserProfile;
 }
 
 export interface QuizQuestion {
@@ -60,6 +71,7 @@ export interface QuizQuestion {
     trait: keyof PhilosopherProfile;
     score: number;
   }[];
+  type?: 'multiple-choice' | 'text-input' | 'multi-select';
 }
 
 // Sample data for development purposes
@@ -357,7 +369,8 @@ export const quizQuestions: QuizQuestion[] = [
         trait: 'openness',
         score: 10
       }
-    ]
+    ],
+    type: 'multiple-choice'
   },
   {
     id: 'question-2',
@@ -387,7 +400,8 @@ export const quizQuestions: QuizQuestion[] = [
         trait: 'conscientiousness',
         score: 20
       }
-    ]
+    ],
+    type: 'multiple-choice'
   },
   {
     id: 'question-3',
@@ -417,7 +431,8 @@ export const quizQuestions: QuizQuestion[] = [
         trait: 'extraversion',
         score: 10
       }
-    ]
+    ],
+    type: 'multiple-choice'
   },
   {
     id: 'question-4',
@@ -447,7 +462,8 @@ export const quizQuestions: QuizQuestion[] = [
         trait: 'agreeableness',
         score: 10
       }
-    ]
+    ],
+    type: 'multiple-choice'
   },
   {
     id: 'question-5',
@@ -477,7 +493,8 @@ export const quizQuestions: QuizQuestion[] = [
         trait: 'neuroticism',
         score: 90
       }
-    ]
+    ],
+    type: 'multiple-choice'
   },
   {
     id: 'question-6',
@@ -507,7 +524,8 @@ export const quizQuestions: QuizQuestion[] = [
         trait: 'conscientiousness',
         score: 10
       }
-    ]
+    ],
+    type: 'multiple-choice'
   },
   {
     id: 'question-7',
@@ -537,7 +555,8 @@ export const quizQuestions: QuizQuestion[] = [
         trait: 'acceptanceAction',
         score: 10
       }
-    ]
+    ],
+    type: 'multiple-choice'
   },
   {
     id: 'question-8',
@@ -567,7 +586,8 @@ export const quizQuestions: QuizQuestion[] = [
         trait: 'tone',
         score: 10
       }
-    ]
+    ],
+    type: 'multiple-choice'
   },
   {
     id: 'question-9',
@@ -597,7 +617,8 @@ export const quizQuestions: QuizQuestion[] = [
         trait: 'practicality',
         score: 10
       }
-    ]
+    ],
+    type: 'multiple-choice'
   },
   {
     id: 'question-10',
@@ -627,12 +648,178 @@ export const quizQuestions: QuizQuestion[] = [
         trait: 'dogmaSkeptic',
         score: 90
       }
-    ]
+    ],
+    type: 'multiple-choice'
   }
 ];
 
-// Enhanced matching function that considers the new attributes
-export function calculatePhilosopherMatch(userProfile: Partial<PhilosopherProfile>, userContext?: string[], wantsContrast: boolean = false): Book[] {
+// Enhanced additional questions to better understand personality variations
+export const enhancedQuizQuestions: QuizQuestion[] = [
+  {
+    id: 'enhanced-question-1',
+    question: 'How does your personality change in different social situations?',
+    options: [
+      {
+        value: 'a',
+        label: 'I remain consistent regardless of who I\'m with',
+        trait: 'extraversion',
+        score: 50
+      },
+      {
+        value: 'b',
+        label: 'I become more extraverted in comfortable settings, introverted in unfamiliar ones',
+        trait: 'extraversion',
+        score: 60
+      },
+      {
+        value: 'c',
+        label: 'I adapt significantly to match the energy of those around me',
+        trait: 'extraversion',
+        score: 70
+      },
+      {
+        value: 'd',
+        label: 'My personality varies dramatically in different contexts',
+        trait: 'extraversion',
+        score: 80
+      }
+    ],
+    type: 'multiple-choice'
+  },
+  {
+    id: 'enhanced-question-2',
+    question: 'How do you respond to intellectual disagreements?',
+    options: [
+      {
+        value: 'a',
+        label: 'I enjoy vigorous debate and often play devil\'s advocate',
+        trait: 'dogmaSkeptic',
+        score: 85
+      },
+      {
+        value: 'b',
+        label: 'I like to ask probing questions to understand different perspectives',
+        trait: 'dogmaSkeptic',
+        score: 70
+      },
+      {
+        value: 'c',
+        label: 'I prefer to find common ground and areas of agreement',
+        trait: 'dogmaSkeptic',
+        score: 50
+      },
+      {
+        value: 'd',
+        label: 'I rely on established authorities and principles to resolve disagreements',
+        trait: 'dogmaSkeptic',
+        score: 30
+      }
+    ],
+    type: 'multiple-choice'
+  },
+  {
+    id: 'enhanced-question-3',
+    question: 'During challenging times in your life, do you tend to:',
+    options: [
+      {
+        value: 'a',
+        label: 'Take immediate action to address the problem',
+        trait: 'acceptanceAction',
+        score: 90
+      },
+      {
+        value: 'b',
+        label: 'Analyze the situation before determining a course of action',
+        trait: 'acceptanceAction',
+        score: 70
+      },
+      {
+        value: 'c',
+        label: 'Seek to understand and accept what cannot be changed',
+        trait: 'acceptanceAction',
+        score: 40
+      },
+      {
+        value: 'd',
+        label: 'Find meaning in difficult experiences without trying to change them',
+        trait: 'acceptanceAction',
+        score: 20
+      }
+    ],
+    type: 'multiple-choice'
+  },
+  {
+    id: 'enhanced-question-4',
+    question: 'How do you approach moral or ethical dilemmas?',
+    options: [
+      {
+        value: 'a',
+        label: 'I follow consistent principles regardless of the situation',
+        trait: 'conscientiousness',
+        score: 85
+      },
+      {
+        value: 'b',
+        label: 'I consider the unique circumstances of each situation',
+        trait: 'conscientiousness',
+        score: 65
+      },
+      {
+        value: 'c',
+        label: 'I prioritize compassion and care for those affected',
+        trait: 'agreeableness',
+        score: 80
+      },
+      {
+        value: 'd',
+        label: 'I weigh the practical consequences of different choices',
+        trait: 'practicality',
+        score: 75
+      }
+    ],
+    type: 'multiple-choice'
+  },
+  {
+    id: 'enhanced-question-5',
+    question: 'How important is tradition in your worldview?',
+    options: [
+      {
+        value: 'a',
+        label: 'Very important - traditions contain accumulated wisdom',
+        trait: 'dogmaSkeptic',
+        score: 30
+      },
+      {
+        value: 'b',
+        label: 'Somewhat important - I respect tradition but question it',
+        trait: 'dogmaSkeptic',
+        score: 50
+      },
+      {
+        value: 'c',
+        label: 'Not very important - I evaluate ideas on their merits',
+        trait: 'dogmaSkeptic',
+        score: 70
+      },
+      {
+        value: 'd',
+        label: 'Unimportant - I\'m interested in creating new possibilities',
+        trait: 'dogmaSkeptic',
+        score: 90
+      }
+    ],
+    type: 'multiple-choice'
+  }
+];
+
+// Enhanced matching function that considers the new attributes and personality variations
+export function calculatePhilosopherMatch(
+  userProfile: Partial<PhilosopherProfile>,
+  userContext?: string[],
+  wantsContrast: boolean = false,
+  seekingType?: 'practical' | 'theoretical' | 'both',
+  variabilityProfile?: Partial<PhilosopherProfile>
+): Book[] {
   // Compute compatibility scores for each book
   const compatibilityScores = books.map(book => {
     let score = 0;
@@ -664,7 +851,7 @@ export function calculatePhilosopherMatch(userProfile: Partial<PhilosopherProfil
         const userValue = userProfile[trait] as number;
         const bookValue = book.profile[trait] as number;
         
-        let traitScore;
+        let traitScore: number;
         
         // For contrast-seeking users, we invert the scoring for some traits
         if (wantsContrast && ['practicality', 'dogmaSkeptic', 'acceptanceAction'].includes(trait)) {
@@ -678,114 +865,23 @@ export function calculatePhilosopherMatch(userProfile: Partial<PhilosopherProfil
       }
     });
     
+    // Handle practicality preferences if the user has specified a seeking type
+    if (seekingType) {
+      const practicalityScore = book.profile.practicality;
+      if (seekingType === 'practical' && practicalityScore > 70) {
+        score += 150; // Bonus for practical books when user wants practical
+        factors++;
+      } else if (seekingType === 'theoretical' && practicalityScore < 40) {
+        score += 150; // Bonus for theoretical books when user wants theoretical
+        factors++;
+      } else if (seekingType === 'both' && practicalityScore >= 40 && practicalityScore <= 70) {
+        score += 150; // Bonus for balanced books when user wants both
+        factors++;
+      }
+    }
+
     // Handle tone separately since it might be a string enum
     if (userProfile.tone && book.profile.tone) {
       // Simple matching for tone: 100 if exact match, 50 if neutral matches with anything, 0 if mismatch
       if (userProfile.tone === book.profile.tone) {
         score += 100;
-      } else if (userProfile.tone === 'neutral' || book.profile.tone === 'neutral') {
-        score += 50;
-      }
-      factors++;
-    }
-    
-    // Calculate average percentage match
-    const matchPercentage = factors > 0 ? Math.round(score / factors) : 50;
-    
-    return {
-      ...book,
-      matchPercentage
-    };
-  });
-  
-  // Sort by match percentage (highest first)
-  return compatibilityScores.sort((a, b) => 
-    (b.matchPercentage ?? 0) - (a.matchPercentage ?? 0)
-  );
-}
-
-// Function to extract possible contexts from user's introspection text
-export function extractContextsFromText(text: string): string[] {
-  const commonContexts = [
-    'anxiety', 'depression', 'meaning', 'purpose', 'religion', 'god', 
-    'mortality', 'death', 'love', 'relationship', 'work', 'career', 
-    'ethics', 'morality', 'politics', 'society', 'identity', 'self',
-    'freedom', 'choice', 'happiness', 'suffering', 'isolation',
-    'technology', 'science', 'nature', 'environment', 'capitalism',
-    'education', 'knowledge', 'truth', 'reality', 'time', 'change'
-  ];
-  
-  // Extract contexts that appear in the text
-  const textLower = text.toLowerCase();
-  const extractedContexts = commonContexts.filter(context => 
-    textLower.includes(context.toLowerCase())
-  );
-  
-  // If no contexts found, return some general ones
-  if (extractedContexts.length === 0) {
-    return ['meaning', 'purpose', 'life'];
-  }
-  
-  return extractedContexts;
-}
-
-// Function to create a user profile from quiz answers and introspection
-export function createUserProfile(
-  answers: Record<string, string>, 
-  introspectionText: string,
-  experienceLevel: string = 'beginner'
-): UserProfile {
-  // Initialize empty profile
-  const personalityTraits: Partial<PhilosopherProfile> = {};
-  
-  // Process quiz answers
-  Object.entries(answers).forEach(([questionId, value]) => {
-    const question = quizQuestions.find(q => q.id === questionId);
-    if (question) {
-      const selectedOption = question.options.find(opt => opt.value === value);
-      if (selectedOption) {
-        const trait = selectedOption.trait;
-        // Handle differently for numeric vs enum types
-        if (trait === 'tone') {
-          // Map the score to tone enum
-          const score = selectedOption.score;
-          if (score >= 70) personalityTraits.tone = 'optimistic';
-          else if (score <= 30) personalityTraits.tone = 'pessimistic';
-          else personalityTraits.tone = 'neutral';
-        } else {
-          // Add the numeric score directly
-          personalityTraits[trait] = selectedOption.score;
-        }
-      }
-    }
-  });
-  
-  // Extract context from introspection text
-  const contexts = extractContextsFromText(introspectionText);
-  
-  // Determine if user wants contrasting perspectives based on their profile
-  // If openness is high and agreeableness is low, they might prefer challenging views
-  const wantsContrast = (personalityTraits.openness || 50) > 70 && 
-                         (personalityTraits.agreeableness || 50) < 40;
-  
-  return {
-    introspectionText,
-    wantsContrast,
-    environment: contexts.join(', '),
-    experienceWithPhilosophy: experienceLevel as 'beginner' | 'intermediate' | 'advanced',
-    personalityTraits
-  };
-}
-
-// Function to get recommendations based on user profile
-export function getRecommendations(userProfile: UserProfile, limit: number = 3): Book[] {
-  const userContexts = extractContextsFromText(userProfile.introspectionText);
-  
-  const matchedBooks = calculatePhilosopherMatch(
-    userProfile.personalityTraits,
-    userContexts,
-    userProfile.wantsContrast
-  );
-  
-  return matchedBooks.slice(0, limit);
-}
