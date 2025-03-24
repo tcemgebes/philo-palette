@@ -1,4 +1,3 @@
-
 export interface Philosopher {
   id: string;
   name: string;
