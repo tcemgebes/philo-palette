@@ -1,9 +1,11 @@
+
 export interface Philosopher {
   id: string;
   name: string;
   era: string;
   movement: string;
   profile: PhilosopherProfile;
+  contextRespondedTo?: string[]; // Historical context they were responding to
 }
 
 export interface PhilosopherProfile {
@@ -14,6 +16,11 @@ export interface PhilosopherProfile {
   neuroticism: number;  // 0-100
   keywords: string[];
   themes: string[];
+  // New philosophical attributes
+  tone: 'optimistic' | 'pessimistic' | 'neutral'; // Overall tone of their work
+  practicality: number; // 0-100 (theoretical to practical)
+  dogmaSkeptic: number; // 0-100 (dogmatic to skeptical)
+  acceptanceAction: number; // 0-100 (acceptance to action-oriented)
 }
 
 export interface Book {
@@ -23,11 +30,25 @@ export interface Book {
   philosopher: string;
   year: string;
   description: string;
+  shortSummary?: string; // Brief summary for quick display
   coverImage: string;
   affiliateLink: string;
+  publicDomainLink?: string; // Link to full text if public domain
   movement: string;
+  era: string; // Historical era
   profile: PhilosopherProfile;
-  matchPercentage?: number;  // Adding this optional property
+  contextRespondedTo?: string[]; // Historical context this book addresses
+  matchPercentage?: number;  // Optional property for recommendation engine
+  isPublicDomain?: boolean; // Whether this is a public domain work
+  source?: 'manual' | 'gutenberg' | 'other'; // Source of the book data
+}
+
+export interface UserProfile {
+  introspectionText: string;
+  wantsContrast: boolean;
+  environment: string;
+  experienceWithPhilosophy: 'beginner' | 'intermediate' | 'advanced';
+  personalityTraits: Partial<PhilosopherProfile>;
 }
 
 export interface QuizQuestion {
@@ -47,8 +68,9 @@ export const philosophers: Philosopher[] = [
   {
     id: 'marcus-aurelius',
     name: 'Marcus Aurelius',
-    era: 'Ancient',
+    era: 'Ancient Rome',
     movement: 'Stoicism',
+    contextRespondedTo: ['Roman Empire politics', 'war', 'disease', 'mortality'],
     profile: {
       openness: 65,
       conscientiousness: 90,
@@ -56,7 +78,11 @@ export const philosophers: Philosopher[] = [
       agreeableness: 75,
       neuroticism: 20,
       keywords: ['duty', 'virtue', 'resilience', 'acceptance', 'discipline'],
-      themes: ['adversity', 'acceptance', 'self-control', 'mortality']
+      themes: ['adversity', 'acceptance', 'self-control', 'mortality'],
+      tone: 'neutral',
+      practicality: 85, // Very practical
+      dogmaSkeptic: 60, // Moderately skeptical
+      acceptanceAction: 70 // Balanced but leans toward acceptance
     }
   },
   {
@@ -64,6 +90,7 @@ export const philosophers: Philosopher[] = [
     name: 'Friedrich Nietzsche',
     era: 'Modern',
     movement: 'Existentialism',
+    contextRespondedTo: ['Christian morality', 'nihilism', 'European culture', 'herd mentality'],
     profile: {
       openness: 95,
       conscientiousness: 70,
@@ -71,7 +98,11 @@ export const philosophers: Philosopher[] = [
       agreeableness: 20,
       neuroticism: 60,
       keywords: ['will', 'power', 'overcoming', 'transvaluation', 'nihilism'],
-      themes: ['meaning', 'struggle', 'creativity', 'individual']
+      themes: ['meaning', 'struggle', 'creativity', 'individual'],
+      tone: 'pessimistic',
+      practicality: 40, // More theoretical
+      dogmaSkeptic: 90, // Highly skeptical
+      acceptanceAction: 85 // Very action-oriented
     }
   },
   {
@@ -79,6 +110,7 @@ export const philosophers: Philosopher[] = [
     name: 'Simone de Beauvoir',
     era: 'Contemporary',
     movement: 'Existentialism',
+    contextRespondedTo: ['patriarchy', 'gender roles', 'post-war France', 'existential freedom'],
     profile: {
       openness: 85,
       conscientiousness: 75,
@@ -86,7 +118,11 @@ export const philosophers: Philosopher[] = [
       agreeableness: 60,
       neuroticism: 45,
       keywords: ['freedom', 'situation', 'transcendence', 'oppression', 'authenticity'],
-      themes: ['gender', 'freedom', 'ethics', 'relationships']
+      themes: ['gender', 'freedom', 'ethics', 'relationships'],
+      tone: 'neutral',
+      practicality: 65, // Balanced
+      dogmaSkeptic: 75, // Moderately skeptical
+      acceptanceAction: 70 // Balanced but action-oriented
     }
   },
   {
@@ -94,6 +130,7 @@ export const philosophers: Philosopher[] = [
     name: 'Albert Camus',
     era: 'Contemporary',
     movement: 'Absurdism',
+    contextRespondedTo: ['World War II', 'nihilism', 'totalitarianism', 'search for meaning'],
     profile: {
       openness: 80,
       conscientiousness: 60,
@@ -101,14 +138,19 @@ export const philosophers: Philosopher[] = [
       agreeableness: 65,
       neuroticism: 40,
       keywords: ['absurd', 'rebellion', 'authenticity', 'meaning', 'suicide'],
-      themes: ['meaning', 'rebellion', 'absurdity', 'happiness']
+      themes: ['meaning', 'rebellion', 'absurdity', 'happiness'],
+      tone: 'optimistic',
+      practicality: 70, // Fairly practical
+      dogmaSkeptic: 85, // Very skeptical
+      acceptanceAction: 75 // Action-oriented
     }
   },
   {
     id: 'epictetus',
     name: 'Epictetus',
-    era: 'Ancient',
+    era: 'Ancient Rome',
     movement: 'Stoicism',
+    contextRespondedTo: ['slavery', 'Roman society', 'personal adversity', 'human suffering'],
     profile: {
       openness: 60,
       conscientiousness: 95,
@@ -116,7 +158,51 @@ export const philosophers: Philosopher[] = [
       agreeableness: 70,
       neuroticism: 15,
       keywords: ['control', 'acceptance', 'perception', 'discipline', 'freedom'],
-      themes: ['freedom', 'control', 'rationality', 'emotions']
+      themes: ['freedom', 'control', 'rationality', 'emotions'],
+      tone: 'neutral',
+      practicality: 90, // Extremely practical
+      dogmaSkeptic: 55, // Moderately dogmatic
+      acceptanceAction: 60 // Balanced but leans toward acceptance
+    }
+  },
+  {
+    id: 'socrates',
+    name: 'Socrates',
+    era: 'Ancient Greece',
+    movement: 'Socratic Method',
+    contextRespondedTo: ['Sophists', 'Athenian democracy', 'moral relativism', 'intellectual arrogance'],
+    profile: {
+      openness: 90,
+      conscientiousness: 75,
+      extraversion: 70,
+      agreeableness: 50,
+      neuroticism: 30,
+      keywords: ['question', 'dialogue', 'wisdom', 'ignorance', 'virtue'],
+      themes: ['knowledge', 'self-examination', 'ethics', 'virtue'],
+      tone: 'neutral',
+      practicality: 65, // Balanced
+      dogmaSkeptic: 95, // Extremely skeptical
+      acceptanceAction: 50 // Balanced
+    }
+  },
+  {
+    id: 'plato',
+    name: 'Plato',
+    era: 'Ancient Greece',
+    movement: 'Platonism',
+    contextRespondedTo: ['death of Socrates', 'Athenian politics', 'relativism', 'materialism'],
+    profile: {
+      openness: 85,
+      conscientiousness: 80,
+      extraversion: 60,
+      agreeableness: 65,
+      neuroticism: 40,
+      keywords: ['forms', 'ideal', 'republic', 'justice', 'knowledge'],
+      themes: ['reality', 'knowledge', 'politics', 'ethics'],
+      tone: 'optimistic',
+      practicality: 40, // More theoretical
+      dogmaSkeptic: 60, // Moderately skeptical
+      acceptanceAction: 45 // Slightly more acceptance-oriented
     }
   }
 ];
@@ -129,10 +215,16 @@ export const books: Book[] = [
     philosopher: 'marcus-aurelius',
     year: '180 CE',
     description: 'Written as a source for his own guidance and self-improvement, Meditations is a series of personal writings by Marcus Aurelius, Roman Emperor from 161 to 180 CE, recording his private notes to himself and ideas on Stoic philosophy.',
+    shortSummary: 'A Roman emperor\'s personal journal on finding tranquility in a chaotic world through stoic principles.',
     coverImage: '/images/meditations.jpg',
     affiliateLink: 'https://www.amazon.com/Meditations-Marcus-Aurelius/dp/0140449337/',
+    publicDomainLink: 'https://www.gutenberg.org/ebooks/2680',
     movement: 'Stoicism',
-    profile: philosophers.find(p => p.id === 'marcus-aurelius')?.profile || philosophers[0].profile
+    era: 'Ancient Rome',
+    isPublicDomain: true,
+    source: 'gutenberg',
+    profile: philosophers.find(p => p.id === 'marcus-aurelius')?.profile || philosophers[0].profile,
+    contextRespondedTo: ['personal grief', 'burden of leadership', 'war', 'mortality']
   },
   {
     id: 'beyond-good-evil',
@@ -141,10 +233,16 @@ export const books: Book[] = [
     philosopher: 'friedrich-nietzsche',
     year: '1886',
     description: 'Beyond Good and Evil confirmed Nietzsche\'s position as the towering European philosopher of his age. The work dramatically rejects the tradition of Western thought with its notions of truth and God, good and evil.',
+    shortSummary: 'A radical critique of traditional morality and a call to move "beyond good and evil" to create new values.',
     coverImage: '/images/beyond-good-evil.jpg',
     affiliateLink: 'https://www.amazon.com/Beyond-Good-Evil-Friedrich-Nietzsche/dp/0140449235/',
+    publicDomainLink: 'https://www.gutenberg.org/ebooks/4363',
     movement: 'Existentialism',
-    profile: philosophers.find(p => p.id === 'friedrich-nietzsche')?.profile || philosophers[1].profile
+    era: 'Modern',
+    isPublicDomain: true,
+    source: 'gutenberg',
+    profile: philosophers.find(p => p.id === 'friedrich-nietzsche')?.profile || philosophers[1].profile,
+    contextRespondedTo: ['Christian morality', 'European philosophy', 'nihilism', 'social conformity']
   },
   {
     id: 'second-sex',
@@ -153,10 +251,15 @@ export const books: Book[] = [
     philosopher: 'simone-de-beauvoir',
     year: '1949',
     description: 'A powerful analysis of the Western notion of "woman," and a groundbreaking exploration of inequality and otherness. De Beauvoir\'s revolutionary work examines the oppression of women from a philosophical perspective.',
+    shortSummary: 'A foundational text of feminism examining how women have been defined as "other" in relation to men throughout history.',
     coverImage: '/images/second-sex.jpg',
     affiliateLink: 'https://www.amazon.com/Second-Sex-Simone-Beauvoir/dp/030727778X/',
     movement: 'Existentialism',
-    profile: philosophers.find(p => p.id === 'simone-de-beauvoir')?.profile || philosophers[2].profile
+    era: 'Contemporary',
+    isPublicDomain: false,
+    source: 'manual',
+    profile: philosophers.find(p => p.id === 'simone-de-beauvoir')?.profile || philosophers[2].profile,
+    contextRespondedTo: ['patriarchy', 'gender inequality', 'post-war France', 'existential freedom']
   },
   {
     id: 'myth-of-sisyphus',
@@ -165,10 +268,15 @@ export const books: Book[] = [
     philosopher: 'albert-camus',
     year: '1942',
     description: 'One of the most influential works of this century, this is a crucial exposition of existentialist thought. Influenced by works such as Don Juan and the novels of Kafka, these essays begin with a meditation on suicide.',
+    shortSummary: 'An exploration of the absurdity of life and the question of suicide, concluding we must embrace the absurd and find meaning anyway.',
     coverImage: '/images/myth-of-sisyphus.jpg',
     affiliateLink: 'https://www.amazon.com/Myth-Sisyphus-Other-Essays/dp/0679733736/',
     movement: 'Absurdism',
-    profile: philosophers.find(p => p.id === 'albert-camus')?.profile || philosophers[3].profile
+    era: 'Contemporary',
+    isPublicDomain: false,
+    source: 'manual',
+    profile: philosophers.find(p => p.id === 'albert-camus')?.profile || philosophers[3].profile,
+    contextRespondedTo: ['existential crisis', 'meaninglessness', 'World War II', 'suicide']
   },
   {
     id: 'enchiridion',
@@ -177,13 +285,50 @@ export const books: Book[] = [
     philosopher: 'epictetus',
     year: '135 CE',
     description: 'The Enchiridion or Handbook of Epictetus is a short manual of Stoic ethical advice compiled by Arrian, a 2nd-century disciple of the Greek philosopher Epictetus. The work consists of fifty-three short chapters.',
+    shortSummary: 'A practical handbook for daily living based on Stoic principles, focusing on what we can and cannot control.',
     coverImage: '/images/enchiridion.jpg',
     affiliateLink: 'https://www.amazon.com/Enchiridion-Dover-Thrift-Editions-Epictetus/dp/0486433595/',
+    publicDomainLink: 'https://www.gutenberg.org/ebooks/45109',
     movement: 'Stoicism',
-    profile: philosophers.find(p => p.id === 'epictetus')?.profile || philosophers[4].profile
+    era: 'Ancient Rome',
+    isPublicDomain: true,
+    source: 'gutenberg',
+    profile: philosophers.find(p => p.id === 'epictetus')?.profile || philosophers[4].profile,
+    contextRespondedTo: ['slavery', 'personal freedom', 'social adversity', 'emotional control']
+  },
+  {
+    id: 'republic',
+    title: 'The Republic',
+    author: 'Plato',
+    philosopher: 'plato',
+    year: '380 BCE',
+    description: 'The Republic is a Socratic dialogue, authored by Plato around 375 BCE, concerning justice, the order and character of the just city-state, and the just man.',
+    shortSummary: 'A foundational work exploring the nature of justice, the ideal society, and the role of the philosopher.',
+    coverImage: '/images/republic.jpg',
+    affiliateLink: 'https://www.amazon.com/Republic-Plato/dp/0465094082/',
+    publicDomainLink: 'https://www.gutenberg.org/ebooks/1497',
+    movement: 'Platonism',
+    era: 'Ancient Greece',
+    isPublicDomain: true,
+    source: 'gutenberg',
+    profile: philosophers.find(p => p.id === 'plato')?.profile || {
+      openness: 85,
+      conscientiousness: 80,
+      extraversion: 60,
+      agreeableness: 65,
+      neuroticism: 40,
+      keywords: ['justice', 'ideal', 'state', 'philosopher-king', 'reality'],
+      themes: ['justice', 'education', 'governance', 'reality'],
+      tone: 'optimistic',
+      practicality: 40,
+      dogmaSkeptic: 60,
+      acceptanceAction: 45
+    },
+    contextRespondedTo: ['Athenian democracy failure', 'sophistry', 'moral relativism', 'societal corruption']
   }
 ];
 
+// Modified questions to include the new philosophical attributes and background
 export const quizQuestions: QuizQuestion[] = [
   {
     id: 'question-1',
@@ -372,26 +517,26 @@ export const quizQuestions: QuizQuestion[] = [
       {
         value: 'a',
         label: 'Finding purpose through duty and contribution to society',
-        trait: 'openness',
+        trait: 'acceptanceAction',
         score: 50
       },
       {
         value: 'b',
         label: 'Creating your own meaning through authentic personal choices',
-        trait: 'openness',
+        trait: 'acceptanceAction',
         score: 90
       },
       {
         value: 'c',
         label: 'Accepting that life has no inherent meaning but finding joy regardless',
-        trait: 'openness',
-        score: 80
+        trait: 'acceptanceAction',
+        score: 30
       },
       {
         value: 'd',
         label: 'Connecting to traditional or spiritual frameworks that provide guidance',
-        trait: 'openness',
-        score: 30
+        trait: 'acceptanceAction',
+        score: 10
       }
     ]
   },
@@ -402,62 +547,146 @@ export const quizQuestions: QuizQuestion[] = [
       {
         value: 'a',
         label: 'An opportunity for growth and developing strength of character',
-        trait: 'neuroticism',
-        score: 20
+        trait: 'tone',
+        score: 80
       },
       {
         value: 'b',
         label: 'A natural part of existence that should be accepted with equanimity',
-        trait: 'neuroticism',
-        score: 40
+        trait: 'tone',
+        score: 50
       },
       {
         value: 'c',
         label: 'Something to be analyzed and understood to reduce its impact',
-        trait: 'neuroticism',
-        score: 60
+        trait: 'tone',
+        score: 30
       },
       {
         value: 'd',
         label: 'A profound problem that reveals the tragic nature of human existence',
-        trait: 'neuroticism',
+        trait: 'tone',
+        score: 10
+      }
+    ]
+  },
+  {
+    id: 'question-9',
+    question: 'What kind of philosophical approach do you prefer?',
+    options: [
+      {
+        value: 'a',
+        label: 'Practical wisdom I can apply to my daily life',
+        trait: 'practicality',
+        score: 90
+      },
+      {
+        value: 'b',
+        label: 'A balance of theory and practical application',
+        trait: 'practicality',
+        score: 60
+      },
+      {
+        value: 'c',
+        label: 'Deep theoretical frameworks that explain the world',
+        trait: 'practicality',
+        score: 30
+      },
+      {
+        value: 'd',
+        label: 'Abstract concepts that challenge conventional thinking',
+        trait: 'practicality',
+        score: 10
+      }
+    ]
+  },
+  {
+    id: 'question-10',
+    question: 'What is your background or current worldview?',
+    options: [
+      {
+        value: 'a',
+        label: 'Religious or spiritual tradition',
+        trait: 'dogmaSkeptic',
+        score: 30
+      },
+      {
+        value: 'b',
+        label: 'Secular humanism',
+        trait: 'dogmaSkeptic',
+        score: 60
+      },
+      {
+        value: 'c',
+        label: 'Scientific materialism',
+        trait: 'dogmaSkeptic',
         score: 80
+      },
+      {
+        value: 'd',
+        label: 'Philosophical skepticism or questioning',
+        trait: 'dogmaSkeptic',
+        score: 90
       }
     ]
   }
 ];
 
-export function calculatePhilosopherMatch(userProfile: Partial<PhilosopherProfile>): Book[] {
-  // In a real implementation, this would use a sophisticated algorithm
-  // For the prototype, we'll use a simple compatibility score
-  
+// Enhanced matching function that considers the new attributes
+export function calculatePhilosopherMatch(userProfile: Partial<PhilosopherProfile>, userContext?: string[], wantsContrast: boolean = false): Book[] {
+  // Compute compatibility scores for each book
   const compatibilityScores = books.map(book => {
     let score = 0;
     let factors = 0;
     
+    // Context matching - check if the book addresses similar contexts to the user's concerns
+    if (userContext && userContext.length > 0 && book.contextRespondedTo) {
+      const contextMatch = userContext.some(context => 
+        book.contextRespondedTo?.some(bookContext => 
+          bookContext.toLowerCase().includes(context.toLowerCase())
+        )
+      );
+      
+      if (contextMatch) {
+        score += 100;
+        factors++;
+      }
+    }
+    
     // Compare personality traits
-    if (userProfile.openness !== undefined) {
-      score += 100 - Math.abs(userProfile.openness - book.profile.openness);
-      factors++;
-    }
+    const traits: (keyof PhilosopherProfile)[] = [
+      'openness', 'conscientiousness', 'extraversion', 
+      'agreeableness', 'neuroticism', 'practicality',
+      'dogmaSkeptic', 'acceptanceAction'
+    ];
     
-    if (userProfile.conscientiousness !== undefined) {
-      score += 100 - Math.abs(userProfile.conscientiousness - book.profile.conscientiousness);
-      factors++;
-    }
+    traits.forEach(trait => {
+      if (userProfile[trait] !== undefined && typeof book.profile[trait] === 'number') {
+        const userValue = userProfile[trait] as number;
+        const bookValue = book.profile[trait] as number;
+        
+        let traitScore;
+        
+        // For contrast-seeking users, we invert the scoring for some traits
+        if (wantsContrast && ['practicality', 'dogmaSkeptic', 'acceptanceAction'].includes(trait)) {
+          traitScore = 100 - Math.abs(100 - userValue - bookValue);
+        } else {
+          traitScore = 100 - Math.abs(userValue - bookValue);
+        }
+        
+        score += traitScore;
+        factors++;
+      }
+    });
     
-    if (userProfile.extraversion !== undefined) {
-      score += 100 - Math.abs(userProfile.extraversion - book.profile.extraversion);
-      factors++;
-    }
-    
-    if (userProfile.agreeableness !== undefined) {
-      score += 100 - Math.abs(userProfile.agreeableness - book.profile.agreeableness);
-      factors++;
-    }
-    
-    if (userProfile.neuroticism !== undefined) {
-      score += 100 - Math.abs(userProfile.neuroticism - book.profile.neuroticism);
+    // Handle tone separately since it might be a string enum
+    if (userProfile.tone && book.profile.tone) {
+      // Simple matching for tone: 100 if exact match, 50 if neutral matches with anything, 0 if mismatch
+      if (userProfile.tone === book.profile.tone) {
+        score += 100;
+      } else if (userProfile.tone === 'neutral' || book.profile.tone === 'neutral') {
+        score += 50;
+      }
       factors++;
     }
     
@@ -471,5 +700,93 @@ export function calculatePhilosopherMatch(userProfile: Partial<PhilosopherProfil
   });
   
   // Sort by match percentage (highest first)
-  return compatibilityScores.sort((a, b) => b.matchPercentage - a.matchPercentage);
+  return compatibilityScores.sort((a, b) => 
+    (b.matchPercentage ?? 0) - (a.matchPercentage ?? 0)
+  );
+}
+
+// Function to extract possible contexts from user's introspection text
+export function extractContextsFromText(text: string): string[] {
+  const commonContexts = [
+    'anxiety', 'depression', 'meaning', 'purpose', 'religion', 'god', 
+    'mortality', 'death', 'love', 'relationship', 'work', 'career', 
+    'ethics', 'morality', 'politics', 'society', 'identity', 'self',
+    'freedom', 'choice', 'happiness', 'suffering', 'isolation',
+    'technology', 'science', 'nature', 'environment', 'capitalism',
+    'education', 'knowledge', 'truth', 'reality', 'time', 'change'
+  ];
+  
+  // Extract contexts that appear in the text
+  const textLower = text.toLowerCase();
+  const extractedContexts = commonContexts.filter(context => 
+    textLower.includes(context.toLowerCase())
+  );
+  
+  // If no contexts found, return some general ones
+  if (extractedContexts.length === 0) {
+    return ['meaning', 'purpose', 'life'];
+  }
+  
+  return extractedContexts;
+}
+
+// Function to create a user profile from quiz answers and introspection
+export function createUserProfile(
+  answers: Record<string, string>, 
+  introspectionText: string,
+  experienceLevel: string = 'beginner'
+): UserProfile {
+  // Initialize empty profile
+  const personalityTraits: Partial<PhilosopherProfile> = {};
+  
+  // Process quiz answers
+  Object.entries(answers).forEach(([questionId, value]) => {
+    const question = quizQuestions.find(q => q.id === questionId);
+    if (question) {
+      const selectedOption = question.options.find(opt => opt.value === value);
+      if (selectedOption) {
+        const trait = selectedOption.trait;
+        // Handle differently for numeric vs enum types
+        if (trait === 'tone') {
+          // Map the score to tone enum
+          const score = selectedOption.score;
+          if (score >= 70) personalityTraits.tone = 'optimistic';
+          else if (score <= 30) personalityTraits.tone = 'pessimistic';
+          else personalityTraits.tone = 'neutral';
+        } else {
+          // Add the numeric score directly
+          personalityTraits[trait] = selectedOption.score;
+        }
+      }
+    }
+  });
+  
+  // Extract context from introspection text
+  const contexts = extractContextsFromText(introspectionText);
+  
+  // Determine if user wants contrasting perspectives based on their profile
+  // If openness is high and agreeableness is low, they might prefer challenging views
+  const wantsContrast = (personalityTraits.openness || 50) > 70 && 
+                         (personalityTraits.agreeableness || 50) < 40;
+  
+  return {
+    introspectionText,
+    wantsContrast,
+    environment: contexts.join(', '),
+    experienceWithPhilosophy: experienceLevel as 'beginner' | 'intermediate' | 'advanced',
+    personalityTraits
+  };
+}
+
+// Function to get recommendations based on user profile
+export function getRecommendations(userProfile: UserProfile, limit: number = 3): Book[] {
+  const userContexts = extractContextsFromText(userProfile.introspectionText);
+  
+  const matchedBooks = calculatePhilosopherMatch(
+    userProfile.personalityTraits,
+    userContexts,
+    userProfile.wantsContrast
+  );
+  
+  return matchedBooks.slice(0, limit);
 }

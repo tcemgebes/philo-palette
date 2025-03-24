@@ -6,8 +6,9 @@ import Footer from '@/components/Footer';
 import QuizQuestion from '@/components/QuizQuestion';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { quizQuestions, PhilosopherProfile } from '@/utils/philosophyData';
+import { quizQuestions, PhilosopherProfile, createUserProfile } from '@/utils/philosophyData';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const Quiz = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -47,8 +48,39 @@ const Quiz = () => {
       setCurrentQuestionIndex(prev => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      // Save user profile to localStorage
-      localStorage.setItem('userProfile', JSON.stringify(userProfile));
+      // Get introspection data from localStorage
+      const introspectionText = localStorage.getItem('introspection') || '';
+      const experienceLevel = localStorage.getItem('experienceLevel') || 'beginner';
+      const preferenceType = localStorage.getItem('preferenceType') || 'align';
+      const background = localStorage.getItem('background') || '';
+
+      // Create full user profile
+      const fullUserProfile = createUserProfile(answers, introspectionText, experienceLevel);
+      
+      // Add preference and background info
+      fullUserProfile.wantsContrast = preferenceType === 'contrast';
+      
+      // Map background to dogmaSkeptic trait if not already set by quiz
+      if (background && !fullUserProfile.personalityTraits.dogmaSkeptic) {
+        switch (background) {
+          case 'religious':
+            fullUserProfile.personalityTraits.dogmaSkeptic = 30;
+            break;
+          case 'secular':
+            fullUserProfile.personalityTraits.dogmaSkeptic = 60;
+            break;
+          case 'scientific':
+            fullUserProfile.personalityTraits.dogmaSkeptic = 80;
+            break;
+          case 'skeptical':
+            fullUserProfile.personalityTraits.dogmaSkeptic = 90;
+            break;
+          // Default or 'other' doesn't modify this trait
+        }
+      }
+      
+      // Save completed user profile to localStorage
+      localStorage.setItem('userProfile', JSON.stringify(fullUserProfile));
       
       // Navigate to results page
       navigate('/results');
@@ -68,26 +100,34 @@ const Quiz = () => {
   const canProceed = answers[currentQuestion?.id] !== undefined;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-retro-black text-retro-sand">
       <Header />
       
       <main className="flex-grow pt-24 pb-16">
         <div className="page-container">
           <div className="max-w-3xl mx-auto mb-12">
             <div className="flex items-center justify-between mb-8">
-              <h1 className="heading-md">Personality Assessment</h1>
-              <div className="text-sm text-muted-foreground">
+              <h1 className="font-mono text-xl sm:text-2xl text-retro-gold">Philosophical Assessment</h1>
+              <div className="text-sm text-retro-sand font-mono">
                 Question {currentQuestionIndex + 1} of {quizQuestions.length}
               </div>
             </div>
             
-            <Progress value={progress} className="h-1 mb-8" />
+            <div className="h-1 bg-retro-sand/30 mb-8">
+              <div 
+                className="h-full bg-retro-gold transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
             
             <div className="space-y-8">
               {quizQuestions.map((question, index) => (
                 <div 
                   key={question.id}
-                  className={index !== currentQuestionIndex ? 'hidden' : ''}
+                  className={cn(
+                    "transition-all duration-500",
+                    index !== currentQuestionIndex ? 'hidden' : ''
+                  )}
                 >
                   <QuizQuestion
                     id={question.id}
@@ -109,7 +149,7 @@ const Quiz = () => {
                   variant="outline"
                   onClick={handlePrevious}
                   disabled={currentQuestionIndex === 0}
-                  className="flex items-center"
+                  className="flex items-center font-mono border-retro-sand text-retro-sand hover:text-retro-gold hover:bg-retro-black/50 rounded-none"
                 >
                   <ArrowLeft size={16} className="mr-2" />
                   <span>Previous</span>
@@ -118,7 +158,10 @@ const Quiz = () => {
                 <Button
                   onClick={handleNext}
                   disabled={!canProceed}
-                  className={`btn-primary flex items-center ${!canProceed ? 'opacity-50' : ''}`}
+                  className={cn(
+                    "font-mono bg-retro-gold text-retro-black hover:bg-retro-sand rounded-none flex items-center",
+                    !canProceed ? "opacity-50 cursor-not-allowed" : ""
+                  )}
                 >
                   {isLastQuestion ? (
                     <>
