@@ -1,3 +1,4 @@
+
 export interface Philosopher {
   id: string;
   name: string;
@@ -885,3 +886,146 @@ export function calculatePhilosopherMatch(
       // Simple matching for tone: 100 if exact match, 50 if neutral matches with anything, 0 if mismatch
       if (userProfile.tone === book.profile.tone) {
         score += 100;
+      } else if (userProfile.tone === 'neutral' || book.profile.tone === 'neutral') {
+        score += 50;
+      }
+      factors++;
+    }
+    
+    // Calculate final average score (as a percentage)
+    const averageScore = factors > 0 ? Math.round((score / factors)) : 0;
+    
+    return {
+      ...book,
+      matchPercentage: averageScore
+    };
+  });
+  
+  // Sort books by match percentage (highest first)
+  return compatibilityScores.sort((a, b) => 
+    (b.matchPercentage || 0) - (a.matchPercentage || 0)
+  );
+}
+
+// Utility functions that would be implemented to:
+// 1. Extract contexts from user's introspection text
+export function extractContextsFromText(text: string): string[] {
+  if (!text) return [];
+  
+  // A simple keyword extraction approach
+  const keywords = [
+    'meaning', 'purpose', 'anxiety', 'depression', 'fear', 'death', 
+    'religion', 'god', 'spirituality', 'ethics', 'morality', 'virtue',
+    'happiness', 'suffering', 'freedom', 'choice', 'responsibility',
+    'identity', 'existence', 'nihilism', 'absurdity', 'love',
+    'relationships', 'society', 'politics', 'justice', 'knowledge',
+    'truth', 'reality', 'beauty', 'art', 'science', 'nature',
+    'technology', 'work', 'success', 'failure', 'mindfulness'
+  ];
+  
+  const extractedContexts = keywords.filter(keyword => 
+    text.toLowerCase().includes(keyword.toLowerCase())
+  );
+  
+  // Also look for bigrams and common philosophical concerns
+  const concerns = [
+    'meaning of life', 'fear of death', 'moral dilemma', 
+    'ethical choice', 'social anxiety', 'religious doubt',
+    'career decision', 'personal identity', 'relationship problem',
+    'political views', 'mental health'
+  ];
+  
+  concerns.forEach(concern => {
+    if (text.toLowerCase().includes(concern.toLowerCase())) {
+      extractedContexts.push(concern);
+    }
+  });
+  
+  return extractedContexts;
+}
+
+// 2. Initialize and update book database (placeholder for external API integration)
+export async function initializeBookDatabase(): Promise<void> {
+  // In a real implementation, this would:
+  // 1. Check if we already have books loaded
+  // 2. If not, fetch initial books from a local source or API
+  // 3. Return a promise that resolves when ready
+  
+  return Promise.resolve(); // For now, we're just using the static books array
+}
+
+export async function updateBookDatabase(): Promise<void> {
+  // In a real implementation, this would:
+  // 1. Fetch new books from Project Gutenberg or other sources
+  // 2. Process them and add to our books array
+  // 3. Return a promise that resolves when complete
+  
+  // Simulate a delay
+  await new Promise(resolve => setTimeout(resolve, 2000));
+  
+  // For demo purposes, let's add a new book
+  const newBookExists = books.some(book => book.id === 'ethics');
+  
+  if (!newBookExists) {
+    books.push({
+      id: 'ethics',
+      title: 'Ethics',
+      author: 'Benedict de Spinoza',
+      philosopher: 'spinoza',
+      year: '1677',
+      description: 'Ethics, demonstrated in geometrical order, is a philosophical treatise written by Benedict de Spinoza. In it, Spinoza presents an ethical vision unifying God, nature, and humanity, emphasizing that true human happiness requires a detached devotion to truth.',
+      shortSummary: 'A geometric approach to understanding God, nature, and human emotions, advocating for rational understanding as the path to freedom.',
+      coverImage: '/images/spinoza-ethics.jpg',
+      affiliateLink: 'https://www.amazon.com/Ethics-Penguin-Classics-Benedict-Spinoza/dp/0140435719/',
+      publicDomainLink: 'https://www.gutenberg.org/ebooks/3800',
+      movement: 'Rationalism',
+      era: 'Early Modern',
+      isPublicDomain: true,
+      source: 'gutenberg',
+      profile: {
+        openness: 80,
+        conscientiousness: 85,
+        extraversion: 30,
+        agreeableness: 60,
+        neuroticism: 20,
+        keywords: ['reason', 'god', 'nature', 'emotions', 'freedom'],
+        themes: ['determinism', 'pantheism', 'rationality', 'happiness'],
+        tone: 'neutral',
+        practicality: 50,
+        dogmaSkeptic: 70,
+        acceptanceAction: 40
+      },
+      contextRespondedTo: ['religious dogma', 'emotions', 'human freedom', 'determinism', 'nature of God']
+    });
+  }
+  
+  return Promise.resolve();
+}
+
+// 3. Get recommendations based on user profile
+export function getRecommendations(userProfile: UserProfile, limit: number = 6): Book[] {
+  // Extract contexts from introspection if not already done
+  const contexts = userProfile.enhancedProfile?.extractedContexts || 
+                   extractContextsFromText(userProfile.introspectionText);
+  
+  // Determine if we want to use contrast or alignment
+  const wantsContrast = userProfile.wantsContrast;
+  
+  // Get the seeking type if available from enhanced profile
+  const seekingType = userProfile.enhancedProfile?.seekingType;
+  
+  // Get personality traits from enhanced profile if available, otherwise use basic profile
+  const personalityTraits = userProfile.enhancedProfile?.personalityTraits || 
+                            userProfile.personalityTraits;
+  
+  // Match books to the user's profile and context
+  const matchedBooks = calculatePhilosopherMatch(
+    personalityTraits, 
+    contexts,
+    wantsContrast,
+    seekingType
+  );
+  
+  // Return the top N matches
+  return matchedBooks.slice(0, limit);
+}
