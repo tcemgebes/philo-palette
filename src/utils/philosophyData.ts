@@ -812,7 +812,34 @@ export const enhancedQuizQuestions: QuizQuestion[] = [
   }
 ];
 
-// Add the missing export for createUserProfile
+// Extract contexts and themes from the introspection text
+function extractContextsFromText(text: string): string[] {
+  // Simple keyword extraction (this could be enhanced with NLP in a real app)
+  const keywords = [
+    'anxiety', 'meaning', 'purpose', 'death', 'morality', 'ethics', 'freedom',
+    'responsibility', 'relationships', 'love', 'work', 'career', 'identity',
+    'religion', 'spirituality', 'politics', 'society', 'technology', 'nature',
+    'happiness', 'success', 'failure', 'depression', 'isolation', 'community',
+    'decision', 'choice', 'future', 'past', 'present', 'time', 'existence',
+    'knowledge', 'truth', 'beauty', 'art', 'science', 'education', 'learning',
+    'change', 'uncertainty', 'certainty', 'doubt', 'belief', 'faith', 'reason',
+    'emotion', 'mind', 'body', 'consciousness', 'self', 'other', 'conflict',
+    'harmony', 'justice', 'injustice', 'suffering', 'joy', 'pain', 'pleasure'
+  ];
+  
+  const extractedKeywords = new Set<string>();
+  const lowerText = text.toLowerCase();
+  
+  keywords.forEach(keyword => {
+    if (lowerText.includes(keyword)) {
+      extractedKeywords.add(keyword);
+    }
+  });
+  
+  return Array.from(extractedKeywords);
+}
+
+// Create a user profile based on quiz answers and introspection
 export function createUserProfile(
   answers: Record<string, string>,
   introspectionText: string,
@@ -864,38 +891,3 @@ export function createUserProfile(
 
 // Enhanced matching function that considers the new attributes and personality variations
 export function calculatePhilosopherMatch(
-  userProfile: Partial<PhilosopherProfile>,
-  userContext?: string[],
-  wantsContrast: boolean = false,
-  seekingType?: 'practical' | 'theoretical' | 'both',
-  variabilityProfile?: Partial<PhilosopherProfile>
-): Book[] {
-  // Compute compatibility scores for each book
-  const compatibilityScores = books.map(book => {
-    let score = 0;
-    let factors = 0;
-    
-    // Context matching - check if the book addresses similar contexts to the user's concerns
-    if (userContext && userContext.length > 0 && book.contextRespondedTo) {
-      const contextMatch = userContext.some(context => 
-        book.contextRespondedTo?.some(bookContext => 
-          bookContext.toLowerCase().includes(context.toLowerCase())
-        )
-      );
-      
-      if (contextMatch) {
-        score += 100;
-        factors++;
-      }
-    }
-    
-    // Compare personality traits
-    const traits: (keyof PhilosopherProfile)[] = [
-      'openness', 'conscientiousness', 'extraversion', 
-      'agreeableness', 'neuroticism', 'practicality',
-      'dogmaSkeptic', 'acceptanceAction'
-    ];
-    
-    traits.forEach(trait => {
-      if (userProfile[trait] !== undefined && typeof book.profile[trait] === 'number') {
-        const userValue = userProfile[
