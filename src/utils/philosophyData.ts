@@ -809,7 +809,8 @@ export const enhancedQuizQuestions: QuizQuestion[] = [
   }
 ];
 
-function extractContextsFromText(text: string): string[] {
+// Ensure this function is exported
+export function extractContextsFromText(text: string): string[] {
   const keywords = [
     'anxiety', 'meaning', 'purpose', 'death', 'morality', 'ethics', 'freedom',
     'responsibility', 'relationships', 'love', 'work', 'career', 'identity',
@@ -891,103 +892,4 @@ export function calculatePhilosopherMatch(
     if (userContext && userContext.length > 0 && book.contextRespondedTo) {
       const contextMatch = userContext.some(context => 
         book.contextRespondedTo?.some(bookContext => 
-          bookContext.toLowerCase().includes(context.toLowerCase())
-        )
-      );
-      
-      if (contextMatch) {
-        score += 100;
-        factors++;
-      }
-    }
-    
-    const traits: (keyof PhilosopherProfile)[] = [
-      'openness', 'conscientiousness', 'extraversion', 
-      'agreeableness', 'neuroticism', 'practicality',
-      'dogmaSkeptic', 'acceptanceAction'
-    ];
-    
-    traits.forEach(trait => {
-      if (userProfile[trait] !== undefined && typeof book.profile[trait] === 'number') {
-        const userValue = userProfile[trait] as number;
-        const bookValue = book.profile[trait] as number;
-        
-        if (wantsContrast) {
-          const difference = Math.abs(userValue - bookValue);
-          const contrastScore = difference > 50 ? 150 - difference : difference;
-          score += contrastScore;
-        } else {
-          const similarityScore = 100 - Math.abs(userValue - bookValue);
-          score += similarityScore;
-        }
-        
-        factors++;
-      }
-    });
-    
-    if (seekingType) {
-      const bookPracticality = book.profile.practicality || 50;
-      
-      if (seekingType === 'practical' && bookPracticality > 70) {
-        score += 100;
-        factors++;
-      } else if (seekingType === 'theoretical' && bookPracticality < 30) {
-        score += 100;
-        factors++;
-      } else if (seekingType === 'both' && bookPracticality >= 30 && bookPracticality <= 70) {
-        score += 100;
-        factors++;
-      }
-    }
-    
-    if (variabilityProfile) {
-      let variabilityScore = 0;
-      let variabilityFactors = 0;
-      
-      traits.forEach(trait => {
-        if (variabilityProfile[trait] !== undefined && typeof book.profile[trait] === 'number') {
-          const variabilityValue = variabilityProfile[trait] as number;
-          const bookValue = book.profile[trait] as number;
-          
-          const midpoint = 50;
-          const distanceFromMidpoint = Math.abs(bookValue - midpoint);
-          
-          if (variabilityValue > 70 && distanceFromMidpoint > 30) {
-            variabilityScore += 100;
-          } 
-          else if (variabilityValue < 30 && distanceFromMidpoint < 20) {
-            variabilityScore += 100;
-          }
-          
-          variabilityFactors++;
-        }
-      });
-      
-      if (variabilityFactors > 0) {
-        score += variabilityScore / variabilityFactors;
-        factors++;
-      }
-    }
-    
-    const averageScore = factors > 0 ? score / factors : 0;
-    
-    return {
-      ...book,
-      matchPercentage: Math.round(averageScore)
-    };
-  });
-  
-  const sortedBooks = compatibilityScores.sort((a, b) => 
-    (b.matchPercentage || 0) - (a.matchPercentage || 0)
-  );
-  
-  return sortedBooks;
-}
-
-export const updateBookDatabase = async (): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, 2000);
-  });
-};
+          bookContext.toLowerCase
