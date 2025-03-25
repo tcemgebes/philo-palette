@@ -74,7 +74,6 @@ export interface QuizQuestion {
   type?: 'multiple-choice' | 'text-input' | 'multi-select';
 }
 
-// Sample data for development purposes
 export const philosophers: Philosopher[] = [
   {
     id: 'marcus-aurelius',
@@ -339,7 +338,6 @@ export const books: Book[] = [
   }
 ];
 
-// Modified questions to include the new philosophical attributes and background
 export const quizQuestions: QuizQuestion[] = [
   {
     id: 'question-1',
@@ -653,7 +651,6 @@ export const quizQuestions: QuizQuestion[] = [
   }
 ];
 
-// Enhanced additional questions to better understand personality variations
 export const enhancedQuizQuestions: QuizQuestion[] = [
   {
     id: 'enhanced-question-1',
@@ -812,9 +809,7 @@ export const enhancedQuizQuestions: QuizQuestion[] = [
   }
 ];
 
-// Extract contexts and themes from the introspection text
 function extractContextsFromText(text: string): string[] {
-  // Simple keyword extraction (this could be enhanced with NLP in a real app)
   const keywords = [
     'anxiety', 'meaning', 'purpose', 'death', 'morality', 'ethics', 'freedom',
     'responsibility', 'relationships', 'love', 'work', 'career', 'identity',
@@ -839,21 +834,17 @@ function extractContextsFromText(text: string): string[] {
   return Array.from(extractedKeywords);
 }
 
-// Create a user profile based on quiz answers and introspection
 export function createUserProfile(
   answers: Record<string, string>,
   introspectionText: string,
   experienceLevel: string,
   enhancedProfile?: EnhancedUserProfile
 ): UserProfile {
-  // Create a basic user profile based on quiz answers and introspection
   const personalityTraits: Partial<PhilosopherProfile> = {};
   
-  // Process quiz answers to determine personality traits
   Object.keys(answers).forEach(questionId => {
     const answer = answers[questionId];
     
-    // Find the matching question and option
     const allQuestions = [...quizQuestions, ...enhancedQuizQuestions];
     const question = allQuestions.find(q => q.id === questionId);
     
@@ -865,20 +856,17 @@ export function createUserProfile(
     }
   });
   
-  // Extract contexts and themes from the introspection text
   const extractedContexts = extractContextsFromText(introspectionText);
   
-  // Create the full user profile
   const userProfile: UserProfile = {
     introspectionText,
-    wantsContrast: false, // Default value, will be updated from UI
+    wantsContrast: false,
     environment: '',
     experienceWithPhilosophy: experienceLevel as 'beginner' | 'intermediate' | 'advanced',
     personalityTraits,
     enhancedProfile: enhancedProfile
   };
   
-  // If enhancedProfile was provided, use it and make sure contexts are set
   if (enhancedProfile) {
     userProfile.enhancedProfile = {
       ...enhancedProfile,
@@ -889,5 +877,117 @@ export function createUserProfile(
   return userProfile;
 }
 
-// Enhanced matching function that considers the new attributes and personality variations
 export function calculatePhilosopherMatch(
+  userProfile: Partial<PhilosopherProfile>,
+  userContext?: string[],
+  wantsContrast: boolean = false,
+  seekingType?: 'practical' | 'theoretical' | 'both',
+  variabilityProfile?: Partial<PhilosopherProfile>
+): Book[] {
+  const compatibilityScores = books.map(book => {
+    let score = 0;
+    let factors = 0;
+    
+    if (userContext && userContext.length > 0 && book.contextRespondedTo) {
+      const contextMatch = userContext.some(context => 
+        book.contextRespondedTo?.some(bookContext => 
+          bookContext.toLowerCase().includes(context.toLowerCase())
+        )
+      );
+      
+      if (contextMatch) {
+        score += 100;
+        factors++;
+      }
+    }
+    
+    const traits: (keyof PhilosopherProfile)[] = [
+      'openness', 'conscientiousness', 'extraversion', 
+      'agreeableness', 'neuroticism', 'practicality',
+      'dogmaSkeptic', 'acceptanceAction'
+    ];
+    
+    traits.forEach(trait => {
+      if (userProfile[trait] !== undefined && typeof book.profile[trait] === 'number') {
+        const userValue = userProfile[trait] as number;
+        const bookValue = book.profile[trait] as number;
+        
+        if (wantsContrast) {
+          const difference = Math.abs(userValue - bookValue);
+          const contrastScore = difference > 50 ? 150 - difference : difference;
+          score += contrastScore;
+        } else {
+          const similarityScore = 100 - Math.abs(userValue - bookValue);
+          score += similarityScore;
+        }
+        
+        factors++;
+      }
+    });
+    
+    if (seekingType) {
+      const bookPracticality = book.profile.practicality || 50;
+      
+      if (seekingType === 'practical' && bookPracticality > 70) {
+        score += 100;
+        factors++;
+      } else if (seekingType === 'theoretical' && bookPracticality < 30) {
+        score += 100;
+        factors++;
+      } else if (seekingType === 'both' && bookPracticality >= 30 && bookPracticality <= 70) {
+        score += 100;
+        factors++;
+      }
+    }
+    
+    if (variabilityProfile) {
+      let variabilityScore = 0;
+      let variabilityFactors = 0;
+      
+      traits.forEach(trait => {
+        if (variabilityProfile[trait] !== undefined && typeof book.profile[trait] === 'number') {
+          const variabilityValue = variabilityProfile[trait] as number;
+          const bookValue = book.profile[trait] as number;
+          
+          const midpoint = 50;
+          const distanceFromMidpoint = Math.abs(bookValue - midpoint);
+          
+          if (variabilityValue > 70 && distanceFromMidpoint > 30) {
+            variabilityScore += 100;
+          } 
+          else if (variabilityValue < 30 && distanceFromMidpoint < 20) {
+            variabilityScore += 100;
+          }
+          
+          variabilityFactors++;
+        }
+      });
+      
+      if (variabilityFactors > 0) {
+        score += variabilityScore / variabilityFactors;
+        factors++;
+      }
+    }
+    
+    const averageScore = factors > 0 ? score / factors : 0;
+    
+    return {
+      ...book,
+      matchPercentage: Math.round(averageScore)
+    };
+  });
+  
+  const sortedBooks = compatibilityScores.sort((a, b) => 
+    (b.matchPercentage || 0) - (a.matchPercentage || 0)
+  );
+  
+  return sortedBooks;
+}
+
+export const updateBookDatabase = async (): Promise<void> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, 2000);
+  });
+};
