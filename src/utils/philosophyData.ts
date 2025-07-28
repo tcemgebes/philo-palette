@@ -22,7 +22,7 @@ export interface PhilosopherProfile {
   acceptanceAction: number; // 0-100 (acceptance to action-oriented)
 }
 
-export interface Book {
+export interface PhilosophyBook {
   id: string;
   title: string;
   author: string;
@@ -217,7 +217,9 @@ export const philosophers: Philosopher[] = [
   }
 ];
 
-export const books: Book[] = [
+export type Book = PhilosophyBook;
+
+export const books: PhilosophyBook[] = [
   {
     id: 'meditations',
     title: 'Meditations',
@@ -852,7 +854,7 @@ export function createUserProfile(
     if (question) {
       const selectedOption = question.options.find(opt => opt.value === answer);
       if (selectedOption) {
-        personalityTraits[selectedOption.trait] = selectedOption.score;
+        (personalityTraits as any)[selectedOption.trait] = selectedOption.score;
       }
     }
   });
@@ -879,12 +881,12 @@ export function createUserProfile(
 }
 
 export function calculatePhilosopherMatch(
-  userProfile: Partial<PhilosopherProfile>,
+  userProfile: UserProfile | Partial<PhilosopherProfile>,
   userContext?: string[],
   wantsContrast: boolean = false,
   seekingType?: 'practical' | 'theoretical' | 'both',
   variabilityProfile?: Partial<PhilosopherProfile>
-): Book[] {
+): PhilosophyBook[] {
   const compatibilityScores = books.map(book => {
     let score = 0;
     let factors = 0;
@@ -892,4 +894,117 @@ export function calculatePhilosopherMatch(
     if (userContext && userContext.length > 0 && book.contextRespondedTo) {
       const contextMatch = userContext.some(context => 
         book.contextRespondedTo?.some(bookContext => 
-          bookContext.toLowerCase
+          bookContext.toLowerCase().includes(context.toLowerCase())
+        )
+      );
+      
+      if (contextMatch) {
+        score += 100;
+        factors++;
+      }
+    }
+    
+    const traits: (keyof PhilosopherProfile)[] = [
+      'openness', 'conscientiousness', 'extraversion', 
+      'agreeableness', 'neuroticism', 'practicality',
+      'dogmaSkeptic', 'acceptanceAction'
+    ];
+    
+    traits.forEach(trait => {
+      if (userProfile[trait] !== undefined && typeof book.profile[trait] === 'number') {
+        const userValue = userProfile[trait] as number;
+        const bookValue = book.profile[trait] as number;
+        
+        if (wantsContrast) {
+          const difference = Math.abs(userValue - bookValue);
+          const contrastScore = difference > 50 ? 150 - difference : difference;
+          score += contrastScore;
+        } else {
+          const similarityScore = 100 - Math.abs(userValue - bookValue);
+          score += similarityScore;
+        }
+        
+        factors++;
+      }
+    });
+    
+    if (seekingType) {
+      const bookPracticality = book.profile.practicality || 50;
+      
+      if (seekingType === 'practical' && bookPracticality > 70) {
+        score += 100;
+        factors++;
+      } else if (seekingType === 'theoretical' && bookPracticality < 30) {
+        score += 100;
+        factors++;
+      } else if (seekingType === 'both' && bookPracticality >= 30 && bookPracticality <= 70) {
+        score += 100;
+        factors++;
+      }
+    }
+    
+    if (variabilityProfile) {
+      let variabilityScore = 0;
+      let variabilityFactors = 0;
+      
+      traits.forEach(trait => {
+        if (variabilityProfile[trait] !== undefined && typeof book.profile[trait] === 'number') {
+          const variabilityValue = variabilityProfile[trait] as number;
+          const bookValue = book.profile[trait] as number;
+          
+          const midpoint = 50;
+          const distanceFromMidpoint = Math.abs(bookValue - midpoint);
+          
+          if (variabilityValue > 70 && distanceFromMidpoint > 30) {
+            variabilityScore += 100;
+          } 
+          else if (variabilityValue < 30 && distanceFromMidpoint < 20) {
+            variabilityScore += 100;
+          }
+          
+          variabilityFactors++;
+        }
+      });
+      
+      if (variabilityFactors > 0) {
+        score += variabilityScore / variabilityFactors;
+        factors++;
+      }
+    }
+    
+    const averageScore = factors > 0 ? score / factors : 0;
+    
+    return {
+      ...book,
+      matchPercentage: Math.round(averageScore)
+    };
+  });
+  
+  const sortedBooks = compatibilityScores.sort((a, b) => 
+    (b.matchPercentage || 0) - (a.matchPercentage || 0)
+  );
+  
+  return sortedBooks;
+}
+
+export const updateBookDatabase = async (): Promise<void> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, 2000);
+  });
+};
+
+export const getRecommendations = (userProfile: UserProfile | PhilosopherProfile, userContext?: string[] | number): PhilosophyBook[] => {
+  // Handle the case where userContext is a number (maxResults)
+  const actualContext = Array.isArray(userContext) ? userContext : undefined;
+  
+  // Extract the personality traits from UserProfile if needed
+  const profileToUse = 'personalityTraits' in userProfile ? userProfile.personalityTraits : userProfile;
+  
+  return calculatePhilosopherMatch(profileToUse as Partial<PhilosopherProfile>, actualContext);
+};
+
+export const initializeBookDatabase = (): Promise<void> => {
+  return Promise.resolve();
+};
