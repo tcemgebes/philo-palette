@@ -13,7 +13,8 @@ import { ArrowLeft, Share2, Heart, BookOpen, Bookmark, Download, RotateCw } from
 import { cn } from '@/lib/utils';
 
 const Results = () => {
-  const [recommendations, setRecommendations] = useState<Book[]>([]);
+  const [alignedRecommendations, setAlignedRecommendations] = useState<Book[]>([]);
+  const [criticalRecommendations, setCriticalRecommendations] = useState<Book[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [showDonationModal, setShowDonationModal] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -38,8 +39,25 @@ const Results = () => {
         try {
           const profile = JSON.parse(userProfileString) as UserProfile;
           setUserProfile(profile);
-          const matchedBooks = getRecommendations(profile, 12); // Increase to 12 books
-          setRecommendations(matchedBooks);
+          
+          // Get aligned recommendations (normal matching)
+          const alignedBooks = getRecommendations(profile, 6);
+          setAlignedRecommendations(alignedBooks);
+          
+          // Get critical/contrasting recommendations by inverting the profile
+          const contrastProfile = {
+            ...profile,
+            personalityTraits: {
+              ...profile.personalityTraits,
+              // Invert key traits to find contrasting viewpoints
+              openness: 100 - (profile.personalityTraits.openness || 50),
+              conscientiousness: 100 - (profile.personalityTraits.conscientiousness || 50),
+              dogmaSkeptic: 100 - (profile.personalityTraits.dogmaSkeptic || 50),
+              acceptanceAction: 100 - (profile.personalityTraits.acceptanceAction || 50),
+            }
+          };
+          const criticalBooks = getRecommendations(contrastProfile, 6);
+          setCriticalRecommendations(criticalBooks);
         } catch (error) {
           console.error('Error calculating recommendations:', error);
         } finally {
@@ -75,8 +93,22 @@ const Results = () => {
           }
         };
         
-        const matchedBooks = getRecommendations(modifiedProfile, 12);
-        setRecommendations(matchedBooks);
+        // Generate both aligned and critical recommendations with modified profile
+        const alignedBooks = getRecommendations(modifiedProfile, 6);
+        setAlignedRecommendations(alignedBooks);
+        
+        const contrastProfile = {
+          ...modifiedProfile,
+          personalityTraits: {
+            ...modifiedProfile.personalityTraits,
+            openness: 100 - (modifiedProfile.personalityTraits.openness || 50),
+            conscientiousness: 100 - (modifiedProfile.personalityTraits.conscientiousness || 50),
+            dogmaSkeptic: 100 - (modifiedProfile.personalityTraits.dogmaSkeptic || 50),
+            acceptanceAction: 100 - (modifiedProfile.personalityTraits.acceptanceAction || 50),
+          }
+        };
+        const criticalBooks = getRecommendations(contrastProfile, 6);
+        setCriticalRecommendations(criticalBooks);
       } catch (error) {
         console.error('Error regenerating recommendations:', error);
       } finally {
@@ -93,7 +125,7 @@ const Results = () => {
     if (navigator.share) {
       navigator.share({
         title: 'My Philosophy Recommendations',
-        text: `I just discovered my philosophical matches on PhiloPalette! My top recommendation is ${recommendations[0]?.title} by ${recommendations[0]?.author}.`,
+        text: `I just discovered my philosophical matches on PhiloPalette! My top recommendation is ${alignedRecommendations[0]?.title} by ${alignedRecommendations[0]?.author}.`,
         url: window.location.href,
       })
         .then(() => console.log('Successful share'))
@@ -105,11 +137,11 @@ const Results = () => {
   };
 
   const getDominantPhilosophy = () => {
-    if (recommendations.length === 0) return null;
+    if (alignedRecommendations.length === 0) return null;
     
     // Count occurrences of each philosophy movement
     const philosophyCounts: Record<string, number> = {};
-    recommendations.slice(0, 3).forEach(book => {
+    alignedRecommendations.slice(0, 3).forEach(book => {
       const movement = book.movement;
       philosophyCounts[movement] = (philosophyCounts[movement] || 0) + 1;
     });
@@ -134,20 +166,32 @@ const Results = () => {
            extractContextsFromText(userProfile.introspectionText);
   };
 
-  const getFilteredBooks = () => {
+  const getFilteredAlignedBooks = () => {
     switch (filterMode) {
       case 'publicDomain':
-        return recommendations.filter(book => book.isPublicDomain);
+        return alignedRecommendations.filter(book => book.isPublicDomain);
       case 'modern':
-        return recommendations.filter(book => !book.isPublicDomain);
+        return alignedRecommendations.filter(book => !book.isPublicDomain);
       default:
-        return recommendations;
+        return alignedRecommendations;
+    }
+  };
+
+  const getFilteredCriticalBooks = () => {
+    switch (filterMode) {
+      case 'publicDomain':
+        return criticalRecommendations.filter(book => book.isPublicDomain);
+      case 'modern':
+        return criticalRecommendations.filter(book => !book.isPublicDomain);
+      default:
+        return criticalRecommendations;
     }
   };
 
   const dominantPhilosophy = getDominantPhilosophy();
   const contextKeywords = getContextKeywords();
-  const filteredBooks = getFilteredBooks();
+  const filteredAlignedBooks = getFilteredAlignedBooks();
+  const filteredCriticalBooks = getFilteredCriticalBooks();
   
   // Skeleton loading state
   if (loading) {
@@ -293,32 +337,88 @@ const Results = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredBooks.map((book) => (
-                <PhilosophyBook
-                  key={book.id}
-                  title={book.title}
-                  author={book.author}
-                  description={book.description}
-                  shortSummary={book.shortSummary}
-                  matchPercentage={book.matchPercentage || 0}
-                  coverImage={book.coverImage}
-                  affiliateLink={book.affiliateLink}
-                  publicDomainLink={book.publicDomainLink}
-                  year={book.year}
-                  philosophy={book.movement}
-                  isPublicDomain={book.isPublicDomain}
-                  era={book.era}
-                  context={book.contextRespondedTo?.join(', ')}
-                />
-              ))}
-            </div>
-            
-            {filteredBooks.length === 0 && (
-              <div className="text-center p-12 border border-retro-sand/30">
-                <p className="text-retro-gold font-mono">No matching books found. Please try again with different responses or try a different filter.</p>
+            {/* Two-column layout for aligned vs critical recommendations */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+              {/* Aligned Recommendations Column */}
+              <div>
+                <div className="mb-6">
+                  <h2 className="font-mono text-xl text-retro-gold mb-2 flex items-center">
+                    <BookOpen size={20} className="mr-2" />
+                    Aligned with Your Views
+                  </h2>
+                  <p className="font-mono text-sm text-retro-sand">
+                    These works resonate with your philosophical perspective and current situation.
+                  </p>
+                </div>
+                
+                <div className="space-y-6">
+                  {filteredAlignedBooks.map((book) => (
+                    <PhilosophyBook
+                      key={`aligned-${book.id}`}
+                      title={book.title}
+                      author={book.author}
+                      description={book.description}
+                      shortSummary={book.shortSummary}
+                      matchPercentage={book.matchPercentage || 0}
+                      coverImage={book.coverImage}
+                      affiliateLink={book.affiliateLink}
+                      publicDomainLink={book.publicDomainLink}
+                      year={book.year}
+                      philosophy={book.movement}
+                      isPublicDomain={book.isPublicDomain}
+                      era={book.era}
+                      context={book.contextRespondedTo?.join(', ')}
+                    />
+                  ))}
+                </div>
+                
+                {filteredAlignedBooks.length === 0 && (
+                  <div className="text-center p-8 border border-retro-sand/30">
+                    <p className="text-retro-gold font-mono">No matching aligned books found with current filter.</p>
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* Critical/Contrasting Recommendations Column */}
+              <div>
+                <div className="mb-6">
+                  <h2 className="font-mono text-xl text-retro-gold mb-2 flex items-center">
+                    <Bookmark size={20} className="mr-2" />
+                    Critical Counterpoints
+                  </h2>
+                  <p className="font-mono text-sm text-retro-sand">
+                    These works challenge your perspective and offer important alternative viewpoints.
+                  </p>
+                </div>
+                
+                <div className="space-y-6">
+                  {filteredCriticalBooks.map((book) => (
+                    <PhilosophyBook
+                      key={`critical-${book.id}`}
+                      title={book.title}
+                      author={book.author}
+                      description={book.description}
+                      shortSummary={book.shortSummary}
+                      matchPercentage={book.matchPercentage || 0}
+                      coverImage={book.coverImage}
+                      affiliateLink={book.affiliateLink}
+                      publicDomainLink={book.publicDomainLink}
+                      year={book.year}
+                      philosophy={book.movement}
+                      isPublicDomain={book.isPublicDomain}
+                      era={book.era}
+                      context={book.contextRespondedTo?.join(', ')}
+                    />
+                  ))}
+                </div>
+                
+                {filteredCriticalBooks.length === 0 && (
+                  <div className="text-center p-8 border border-retro-sand/30">
+                    <p className="text-retro-gold font-mono">No contrasting books found with current filter.</p>
+                  </div>
+                )}
+              </div>
+            </div>
             
             <div className="mt-16 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
               <Button
