@@ -26,24 +26,35 @@ const Results = () => {
     // Check if user has completed the quiz
     const userProfileString = localStorage.getItem('userProfile');
     if (!userProfileString) {
+      console.log('No user profile found, redirecting to quiz');
       navigate('/quiz');
       return;
     }
 
     // Show loading state
     setLoading(true);
+    console.log('Starting results calculation...');
+    
+    // Add a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.log('Results calculation timed out, setting loading to false');
+      setLoading(false);
+    }, 10000); // 10 second timeout
     
     // Initialize book database first, then generate recommendations
     initializeBookDatabase()
       .then(() => {
         try {
+          console.log('Book database initialized, parsing user profile...');
           const profile = JSON.parse(userProfileString) as UserProfile;
           setUserProfile(profile);
           
+          console.log('Generating aligned recommendations...');
           // Get aligned recommendations (normal matching)
           const alignedBooks = getRecommendations(profile, 6);
           setAlignedRecommendations(alignedBooks);
           
+          console.log('Generating critical recommendations...');
           // Get critical/contrasting recommendations by inverting the profile
           const contrastProfile = {
             ...profile,
@@ -58,9 +69,12 @@ const Results = () => {
           };
           const criticalBooks = getRecommendations(contrastProfile, 6);
           setCriticalRecommendations(criticalBooks);
+          
+          console.log('Results calculation completed successfully');
         } catch (error) {
           console.error('Error calculating recommendations:', error);
         } finally {
+          clearTimeout(timeoutId);
           setLoading(false);
           
           // Show donation modal after a delay
@@ -71,6 +85,7 @@ const Results = () => {
       })
       .catch(error => {
         console.error('Error initializing book database:', error);
+        clearTimeout(timeoutId);
         setLoading(false);
       });
   }, [navigate]);
@@ -101,6 +116,7 @@ const Results = () => {
           ...modifiedProfile,
           personalityTraits: {
             ...modifiedProfile.personalityTraits,
+            // Invert key traits to find contrasting viewpoints
             openness: 100 - (modifiedProfile.personalityTraits.openness || 50),
             conscientiousness: 100 - (modifiedProfile.personalityTraits.conscientiousness || 50),
             dogmaSkeptic: 100 - (modifiedProfile.personalityTraits.dogmaSkeptic || 50),
@@ -118,6 +134,8 @@ const Results = () => {
   };
 
   const restartJourney = () => {
+    localStorage.removeItem('userProfile');
+    localStorage.removeItem('quizAnswers');
     navigate('/');
   };
 
@@ -420,30 +438,23 @@ const Results = () => {
               </div>
             </div>
             
-            <div className="mt-16 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <Button
-                variant="outline"
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button 
                 onClick={restartJourney}
-                className="flex items-center space-x-2 font-mono border-retro-sand text-retro-sand hover:text-retro-gold hover:bg-retro-black/50 rounded-none"
+                variant="outline"
+                className="font-mono border-retro-sand text-retro-sand hover:text-retro-gold hover:bg-retro-black/50 rounded-none"
               >
-                <ArrowLeft size={16} />
-                <span>Start Again</span>
+                <ArrowLeft size={16} className="mr-2" />
+                Start Over
               </Button>
               
-              <Button
+              <Button 
                 onClick={shareResults}
-                className="flex items-center space-x-2 font-mono bg-retro-sand text-retro-black hover:bg-retro-gold rounded-none"
+                className="font-mono bg-retro-gold text-retro-black hover:bg-retro-sand rounded-none"
               >
-                <Share2 size={16} />
-                <span>Share Results</span>
-              </Button>
-              
-              <Button
-                onClick={() => setShowDonationModal(true)}
-                className="flex items-center space-x-2 font-mono bg-retro-gold text-retro-black hover:bg-retro-sand rounded-none"
-              >
-                <Heart size={16} />
-                <span>Support This Project</span>
+                <Share2 size={16} className="mr-2" />
+                Share Results
               </Button>
             </div>
           </div>
@@ -452,10 +463,12 @@ const Results = () => {
       
       <Footer />
       
-      <DonationModal
-        isOpen={showDonationModal}
-        onClose={() => setShowDonationModal(false)}
-      />
+      {showDonationModal && (
+        <DonationModal 
+          isOpen={showDonationModal} 
+          onClose={() => setShowDonationModal(false)} 
+        />
+      )}
     </div>
   );
 };

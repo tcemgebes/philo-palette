@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const INTRO_SCENES = [
   {
@@ -31,9 +31,15 @@ const INTRO_SCENES = [
 const IntroScene: React.FC = () => {
   const [currentScene, setCurrentScene] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [autoAdvance, setAutoAdvance] = useState(true);
+  const [scrollTimeout, setScrollTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [transitionTimeout, setTransitionTimeout] = useState<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
 
+  // Auto-advance timer (only when autoAdvance is true)
   useEffect(() => {
+    if (!autoAdvance) return;
+    
     const timer = setTimeout(() => {
       if (currentScene < INTRO_SCENES.length - 1) {
         setIsTransitioning(true);
@@ -50,7 +56,115 @@ const IntroScene: React.FC = () => {
     }, 5000);
     
     return () => clearTimeout(timer);
-  }, [currentScene, navigate]);
+  }, [currentScene, navigate, autoAdvance]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft' && currentScene > 0) {
+        goToPrevious();
+      } else if (e.key === 'ArrowRight' && currentScene < INTRO_SCENES.length - 1) {
+        goToNext();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [currentScene]);
+
+  // Scroll navigation (insensitive)
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      
+      // Clear existing timeout
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      
+      // Set new timeout to prevent too sensitive scrolling
+      const timeout = setTimeout(() => {
+        if (e.deltaY > 0 && currentScene < INTRO_SCENES.length - 1) {
+          goToNext();
+        } else if (e.deltaY < 0 && currentScene > 0) {
+          goToPrevious();
+        }
+      }, 150);
+      
+      setScrollTimeout(timeout);
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+    };
+  }, [currentScene, scrollTimeout]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (transitionTimeout) clearTimeout(transitionTimeout);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+    };
+  }, [transitionTimeout, scrollTimeout]);
+
+  const goToNext = () => {
+    if (currentScene < INTRO_SCENES.length - 1 && !isTransitioning) {
+      setAutoAdvance(false); // Disable auto-advance when user takes control
+      setIsTransitioning(true);
+      
+      // Clear any existing transition timeout
+      if (transitionTimeout) {
+        clearTimeout(transitionTimeout);
+      }
+      
+      const timeout = setTimeout(() => {
+        setCurrentScene(prev => prev + 1);
+        setIsTransitioning(false);
+      }, 1000);
+      
+      setTransitionTimeout(timeout);
+    }
+  };
+
+  const goToPrevious = () => {
+    if (currentScene > 0 && !isTransitioning) {
+      setAutoAdvance(false); // Disable auto-advance when user takes control
+      setIsTransitioning(true);
+      
+      // Clear any existing transition timeout
+      if (transitionTimeout) {
+        clearTimeout(transitionTimeout);
+      }
+      
+      const timeout = setTimeout(() => {
+        setCurrentScene(prev => prev - 1);
+        setIsTransitioning(false);
+      }, 1000);
+      
+      setTransitionTimeout(timeout);
+    }
+  };
+
+  const goToScene = (sceneIndex: number) => {
+    if (sceneIndex !== currentScene && !isTransitioning) {
+      setAutoAdvance(false); // Disable auto-advance when user takes control
+      setIsTransitioning(true);
+      
+      // Clear any existing transition timeout
+      if (transitionTimeout) {
+        clearTimeout(transitionTimeout);
+      }
+      
+      const timeout = setTimeout(() => {
+        setCurrentScene(sceneIndex);
+        setIsTransitioning(false);
+      }, 1000);
+      
+      setTransitionTimeout(timeout);
+    }
+  };
 
   const skipIntro = () => {
     setIsTransitioning(true);
@@ -76,27 +190,41 @@ const IntroScene: React.FC = () => {
             isTransitioning ? "opacity-0 transform translate-y-10" : "opacity-100 transform translate-y-0"
           )}
         >
-          <div className="mb-8 border-2 border-retro-sand bg-retro-black/80 p-8">
-            <p className="text-2xl sm:text-3xl md:text-4xl font-pixel text-retro-gold leading-relaxed tracking-wider">
-              {INTRO_SCENES[currentScene]?.text}
-            </p>
+          {/* Navigation arrows */}
+          <div className="flex justify-between items-center w-full mb-8">
+            <button
+              onClick={goToPrevious}
+              disabled={currentScene === 0}
+              className={cn(
+                "p-3 border border-retro-gold transition-all duration-300",
+                currentScene === 0 
+                  ? "opacity-30 cursor-not-allowed" 
+                  : "hover:bg-retro-gold/10 cursor-pointer"
+              )}
+            >
+              <ChevronLeft size={24} className="text-retro-gold" />
+            </button>
+            
+            <div className="border-2 border-retro-sand bg-retro-black/80 p-8 flex-1 mx-4">
+              <p className="text-2xl sm:text-3xl md:text-4xl font-pixel text-retro-gold leading-relaxed tracking-wider">
+                {INTRO_SCENES[currentScene]?.text}
+              </p>
+            </div>
+            
+            <button
+              onClick={goToNext}
+              disabled={currentScene === INTRO_SCENES.length - 1}
+              className={cn(
+                "p-3 border border-retro-gold transition-all duration-300",
+                currentScene === INTRO_SCENES.length - 1 
+                  ? "opacity-30 cursor-not-allowed" 
+                  : "hover:bg-retro-gold/10 cursor-pointer"
+              )}
+            >
+              <ChevronRight size={24} className="text-retro-gold" />
+            </button>
           </div>
           
-          {/* Stats display inspired by the image */}
-          <div className="flex justify-center gap-12 mb-12">
-            <div className="flex flex-col items-center">
-              <span className="text-retro-gold text-5xl font-mono">†</span>
-              <span className="text-retro-gold font-mono">{55 - currentScene * 10}</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-retro-gold text-5xl font-mono">🗡️</span>
-              <span className="text-retro-gold font-mono">{60 - currentScene * 5}</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-retro-gold text-5xl font-mono">$</span>
-              <span className="text-retro-gold font-mono">{currentScene * 15}</span>
-            </div>
-          </div>
           
           {/* Start button for the last scene */}
           {currentScene === INTRO_SCENES.length - 1 && (
@@ -113,11 +241,12 @@ const IntroScene: React.FC = () => {
         <div className="absolute bottom-10 flex flex-col items-center space-y-6">
           <div className="flex space-x-4">
             {INTRO_SCENES.map((_, index) => (
-              <div 
+              <button
                 key={index}
+                onClick={() => goToScene(index)}
                 className={cn(
-                  "w-3 h-3",
-                  currentScene === index ? "bg-retro-gold" : "bg-retro-gold/30"
+                  "w-3 h-3 transition-all duration-300 hover:scale-110",
+                  currentScene === index ? "bg-retro-gold" : "bg-retro-gold/30 hover:bg-retro-gold/60"
                 )}
               />
             ))}
@@ -132,11 +261,6 @@ const IntroScene: React.FC = () => {
         </div>
       </div>
       
-      {/* Year counter at bottom */}
-      <div className="absolute bottom-4 right-4 flex items-center space-x-2 font-mono text-retro-gold">
-        <span className="text-xl">{1000 + currentScene * 20}</span>
-        <span className="text-sm">YEARS IN POWER</span>
-      </div>
     </div>
   );
 };

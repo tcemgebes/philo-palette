@@ -3,13 +3,46 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { ArrowRight, Book, Brain, Lightbulb, Scroll } from 'lucide-react';
+import { ArrowRight, Book, Brain, Lightbulb, Scroll, TestTube } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
   
   const startJourney = () => {
     navigate('/introduction');
+  };
+
+  const createTestData = () => {
+    // Create sample user profile for testing
+    const testProfile = {
+      introspectionText: "I've been questioning the meaning of life and my purpose in the world. I find myself wondering whether my actions have any real significance in the grand scheme of things.",
+      wantsContrast: false,
+      environment: "urban",
+      experienceWithPhilosophy: "beginner" as const,
+      personalityTraits: {
+        openness: 75,
+        conscientiousness: 60,
+        extraversion: 40,
+        agreeableness: 70,
+        neuroticism: 45,
+        dogmaSkeptic: 65,
+        acceptanceAction: 55
+      }
+    };
+
+    const testQuizAnswers = {
+      meaning: "seeking",
+      knowledge: "skeptical",
+      ethics: "deontological",
+      reality: "materialist",
+      politics: "individualist"
+    };
+
+    localStorage.setItem('userProfile', JSON.stringify(testProfile));
+    localStorage.setItem('quizAnswers', JSON.stringify(testQuizAnswers));
+    
+    console.log('✅ Test data created!');
+    alert('Test data created! You can now go to /results to test the app.');
   };
   
   return (
@@ -37,13 +70,24 @@ const Index = () => {
                 Discover philosophical works that resonate with your personality and address your unique questions about life, meaning, and personal growth.
               </p>
               
-              <Button 
-                onClick={startJourney}
-                className="btn-primary group mt-8"
-              >
-                <span>Begin Your Journey</span>
-                <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-              </Button>
+              <div className="flex gap-4 justify-center">
+                <Button 
+                  onClick={startJourney}
+                  className="btn-primary group"
+                >
+                  <span>Begin Your Journey</span>
+                  <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                </Button>
+                
+                <Button 
+                  onClick={createTestData}
+                  variant="outline"
+                  className="group"
+                >
+                  <TestTube size={16} className="mr-2" />
+                  <span>Create Test Data</span>
+                </Button>
+              </div>
             </div>
           </div>
           
@@ -131,7 +175,7 @@ const Index = () => {
               ].map((tradition, index) => (
                 <div 
                   key={index}
-                  className="bg-white dark:bg-black border border-border rounded-lg p-6 hover:shadow-md transition-shadow duration-300"
+                  className="glass-panel p-6 rounded-lg hover:shadow-md transition-shadow duration-300"
                 >
                   <tradition.icon size={24} className="text-primary mb-4" />
                   <h3 className="text-lg font-medium mb-2">{tradition.title}</h3>
@@ -142,7 +186,7 @@ const Index = () => {
             
             <div className="mt-12 text-center">
               <Button 
-                onClick={startJourney}
+                onClick={() => navigate('/traditions')}
                 variant="outline"
                 className="group"
               >
@@ -154,17 +198,17 @@ const Index = () => {
         </section>
         
         {/* Call to Action */}
-        <section className="py-24 bg-primary text-primary-foreground">
+        <section className="py-24 bg-secondary/30">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="max-w-3xl mx-auto space-y-6">
               <h2 className="heading-lg">Begin Your Philosophical Journey</h2>
-              <p className="text-primary-foreground/80 text-lg">
+              <p className="body-text">
                 Find the philosophical perspectives that resonate with your unique situation.
               </p>
               
               <Button 
                 onClick={startJourney}
-                className="bg-white text-primary hover:bg-white/90 transition-colors mt-6 group"
+                className="btn-primary group"
               >
                 <span>Start Now</span>
                 <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />
