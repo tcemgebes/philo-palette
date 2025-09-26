@@ -1,69 +1,200 @@
-# Welcome to your Lovable project
+# Philo Palette 🎭
 
-## Project info
+> **Discover Your Philosophical Path Through AI-Powered Personality Matching**
 
-**URL**: https://lovable.dev/projects/033b28e9-8c1e-4c14-a77f-68b3d326b6c3
+A sophisticated web application that matches users with philosophical traditions and books based on their personality, challenges, and philosophical interests. Built with modern web technologies and powered by AI analysis.
 
-## How can I edit this code?
+## 🌟 Features
 
-There are several ways of editing your application.
+### 🧠 **AI-Powered Personality Analysis**
+- Comprehensive personality assessment using the Big Five model
+- Advanced philosophical compatibility scoring
+- Personalized book recommendations based on user profile
 
-**Use Lovable**
+### 📚 **Extensive Philosophy Database**
+- **11 Major Philosophical Traditions** - From Stoicism to Utilitarianism
+- **6 Curated Philosophy Books** - Classic works with detailed analysis
+- **Interactive Traditions Explorer** - Browse philosophical traditions with detailed information
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/033b28e9-8c1e-4c14-a77f-68b3d326b6c3) and start prompting.
+### 🎯 **Personalized Journey**
+- **Introspective Assessment** - Share your challenges and philosophical interests
+- **Interactive Quiz** - Answer questions about meaning, knowledge, ethics, and reality
+- **Personalized Results** - Get matched with philosophical traditions and book recommendations
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🎨 **Beautiful, Responsive Design**
+- Retro-inspired aesthetic with modern functionality
+- Glass panel design with golden color scheme
+- Fully responsive across all devices
+- Smooth animations and transitions
 
-**Use your preferred IDE**
+## 🚀 Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Installation
 
-Follow these steps:
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/tcemgebes/philo-palette.git
+   cd philo-palette
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+3. **Set up environment variables**
+   ```bash
+   cp env.example .env
+   ```
+   Add your API keys to the `.env` file:
+   ```
+   VITE_OPENAI_API_KEY=your_openai_api_key
+   VITE_ANTHROPIC_API_KEY=your_anthropic_api_key
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+5. **Open your browser**
+   Navigate to `http://localhost:8080`
+
+## 🏗️ Tech Stack
+
+- **Frontend**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS + Custom CSS
+- **UI Components**: shadcn/ui + Radix UI
+- **Icons**: Lucide React
+- **Routing**: React Router DOM
+- **State Management**: TanStack Query
+- **AI Integration**: OpenAI GPT-4 + Anthropic Claude
+
+## 📁 Project Structure
+
+```
+philo-palette/
+├── src/
+│   ├── components/          # Reusable UI components
+│   │   ├── ui/             # shadcn/ui components
+│   │   ├── Header.tsx      # Navigation header
+│   │   ├── Footer.tsx      # Site footer
+│   │   └── ...
+│   ├── pages/              # Main application pages
+│   │   ├── Index.tsx       # Home page
+│   │   ├── Introduction.tsx # Intro page with navigation
+│   │   ├── Introspection.tsx # Personality assessment
+│   │   ├── Quiz.tsx        # Philosophical quiz
+│   │   ├── Results.tsx     # Personalized results
+│   │   └── Traditions.tsx  # Philosophy traditions explorer
+│   ├── utils/              # Utility functions and data
+│   │   ├── philosophyData.ts # Philosophy books and traditions
+│   │   ├── aiService.ts    # AI integration services
+│   │   └── ...
+│   └── hooks/              # Custom React hooks
+├── public/
+│   └── images/             # Book cover images
+└── ...
 ```
 
-**Edit a file directly in GitHub**
+## 🎯 Key Features Explained
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### **Philosophical Traditions Explorer**
+- Browse 11 major philosophical traditions
+- Each tradition includes key philosophers, core themes, and historical context
+- Beautiful card-based layout with color-coded icons
 
-**Use GitHub Codespaces**
+### **AI-Powered Matching**
+- Advanced personality analysis using multiple AI models
+- Sophisticated compatibility scoring algorithm
+- Personalized book recommendations with reasoning
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### **Interactive Assessment**
+- Multi-step personality assessment
+- Philosophical preference quiz
+- Context-aware question generation
 
-## What technologies are used for this project?
+## 🎨 Design Philosophy
 
-This project is built with .
+The application features a **retro-inspired aesthetic** that pays homage to classical philosophy while maintaining modern usability:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Color Scheme**: Deep backgrounds with golden accents (`#e8da99`, `#c3b17f`)
+- **Typography**: Monospace fonts for a scholarly feel
+- **Layout**: Glass panels with subtle borders and shadows
+- **Interactions**: Smooth transitions and hover effects
 
-## How can I deploy this project?
+## 🔧 Development
 
-Simply open [Lovable](https://lovable.dev/projects/033b28e9-8c1e-4c14-a77f-68b3d326b6c3) and click on Share -> Publish.
+### Available Scripts
 
-## I want to use a custom domain - is that possible?
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+```
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+### Code Style
+- TypeScript for type safety
+- ESLint for code quality
+- Prettier for code formatting
+- Component-based architecture
+
+## 📚 Philosophy Database
+
+### **Included Traditions**
+1. **Stoicism** - Marcus Aurelius, Epictetus, Seneca
+2. **Existentialism** - Sartre, Beauvoir, Camus, Nietzsche
+3. **Buddhism** - Siddhartha Gautama, mindfulness, compassion
+4. **Analytical Philosophy** - Russell, Wittgenstein, logic
+5. **Platonism** - Plato, Forms, ideal reality
+6. **Pragmatism** - James, Dewey, practical consequences
+7. **Phenomenology** - Husserl, Heidegger, consciousness
+8. **Feminist Philosophy** - Beauvoir, Butler, gender studies
+9. **Confucianism** - Confucius, social harmony
+10. **Taoism** - Lao Tzu, naturalness, balance
+11. **Utilitarianism** - Bentham, Mill, greatest happiness
+
+### **Featured Books**
+- **Meditations** by Marcus Aurelius
+- **Beyond Good and Evil** by Friedrich Nietzsche
+- **The Second Sex** by Simone de Beauvoir
+- **The Myth of Sisyphus** by Albert Camus
+- **Enchiridion** by Epictetus
+- **The Republic** by Plato
+
+## 🤝 Contributing
+
+We welcome contributions! Please feel free to:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 🙏 Acknowledgments
+
+- **Philosophical Inspiration**: All the great philosophers whose works continue to guide us
+- **AI Technology**: OpenAI and Anthropic for their powerful language models
+- **Open Source Community**: React, Vite, Tailwind CSS, and all the amazing open source tools
+- **Collaborative Development**: Built through iterative collaboration and user feedback
+
+## 📞 Support
+
+If you have any questions or need help getting started, please open an issue on GitHub.
+
+---
+
+**Built with ❤️ for philosophy enthusiasts and curious minds**
+
+*"The unexamined life is not worth living." - Socrates*
