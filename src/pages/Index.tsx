@@ -63,7 +63,7 @@ const Index = () => {
               </span>
               
               <h1 className="heading-xl">
-                Philosophy Tailored to Your Personal Challenges
+                Discover Your Philosophical Path
               </h1>
               
               <p className="body-text">

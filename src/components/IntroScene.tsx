@@ -18,7 +18,7 @@ const INTRO_SCENES = [
   },
   {
     id: 3,
-    text: "Likely some have described your problem as their own.",
+    text: "Likely, some have described your problem as their own.",
     image: "/lovable-uploads/9ff07881-6aa2-49b8-aa4f-0b22115fc5fd.png"
   },
   {
