@@ -356,85 +356,90 @@ const Results = () => {
             </div>
             
             {/* Two-column layout for aligned vs critical recommendations */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-              {/* Aligned Recommendations Column */}
-              <div>
-                <div className="mb-6">
-                  <h2 className="font-mono text-xl text-retro-gold mb-2 flex items-center">
-                    <BookOpen size={20} className="mr-2" />
-                    Aligned with Your Views
-                  </h2>
-                  <p className="font-mono text-sm text-retro-sand">
-                    These works resonate with your philosophical perspective and current situation.
-                  </p>
-                </div>
-                
-                <div className="space-y-6">
-                  {filteredAlignedBooks.map((book) => (
-                    <PhilosophyBook
-                      key={`aligned-${book.id}`}
-                      title={book.title}
-                      author={book.author}
-                      description={book.description}
-                      shortSummary={book.shortSummary}
-                      matchPercentage={book.matchPercentage || 0}
-                      coverImage={book.coverImage}
-                      affiliateLink={book.affiliateLink}
-                      publicDomainLink={book.publicDomainLink}
-                      year={book.year}
-                      philosophy={book.movement}
-                      isPublicDomain={book.isPublicDomain}
-                      era={book.era}
-                      context={book.contextRespondedTo?.join(', ')}
-                    />
-                  ))}
-                </div>
-                
-                {filteredAlignedBooks.length === 0 && (
-                  <div className="text-center p-8 border border-retro-sand/30">
-                    <p className="text-retro-gold font-mono">No matching aligned books found with current filter.</p>
+            <div className="relative">
+              {/* Visual Separator - Only show on large screens, positioned between book sections */}
+              <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-[#c3b17f]/20 via-[#c3b17f]/50 to-[#c3b17f]/20 transform -translate-x-1/2 z-10"></div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
+                {/* Aligned Recommendations Column */}
+                <div>
+                  <div className="mb-6">
+                    <h2 className="font-mono text-xl text-retro-gold mb-2 flex items-center">
+                      <BookOpen size={20} className="mr-2" />
+                      Aligned with Your Views
+                    </h2>
+                    <p className="font-mono text-sm text-retro-sand">
+                      These works resonate with your philosophical perspective and current situation.
+                    </p>
                   </div>
-                )}
-              </div>
-
-              {/* Critical/Contrasting Recommendations Column */}
-              <div>
-                <div className="mb-6">
-                  <h2 className="font-mono text-xl text-retro-gold mb-2 flex items-center">
-                    <Bookmark size={20} className="mr-2" />
-                    Critical Counterpoints
-                  </h2>
-                  <p className="font-mono text-sm text-retro-sand">
-                    These works challenge your perspective and offer important alternative viewpoints.
-                  </p>
-                </div>
-                
-                <div className="space-y-6">
-                  {filteredCriticalBooks.map((book) => (
-                    <PhilosophyBook
-                      key={`critical-${book.id}`}
-                      title={book.title}
-                      author={book.author}
-                      description={book.description}
-                      shortSummary={book.shortSummary}
-                      matchPercentage={book.matchPercentage || 0}
-                      coverImage={book.coverImage}
-                      affiliateLink={book.affiliateLink}
-                      publicDomainLink={book.publicDomainLink}
-                      year={book.year}
-                      philosophy={book.movement}
-                      isPublicDomain={book.isPublicDomain}
-                      era={book.era}
-                      context={book.contextRespondedTo?.join(', ')}
-                    />
-                  ))}
-                </div>
-                
-                {filteredCriticalBooks.length === 0 && (
-                  <div className="text-center p-8 border border-retro-sand/30">
-                    <p className="text-retro-gold font-mono">No contrasting books found with current filter.</p>
+                  
+                  <div className="space-y-6">
+                    {filteredAlignedBooks.map((book) => (
+                      <PhilosophyBook
+                        key={`aligned-${book.id}`}
+                        title={book.title}
+                        author={book.author}
+                        description={book.description}
+                        shortSummary={book.shortSummary}
+                        matchPercentage={book.matchPercentage || 0}
+                        coverImage={book.coverImage}
+                        affiliateLink={book.affiliateLink}
+                        publicDomainLink={book.publicDomainLink}
+                        year={book.year}
+                        philosophy={book.movement}
+                        isPublicDomain={book.isPublicDomain}
+                        era={book.era}
+                        context={book.contextRespondedTo?.join(', ')}
+                      />
+                    ))}
                   </div>
-                )}
+                  
+                  {filteredAlignedBooks.length === 0 && (
+                    <div className="text-center p-8 border border-retro-sand/30">
+                      <p className="text-retro-gold font-mono">No matching aligned books found with current filter.</p>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Critical/Contrasting Recommendations Column */}
+                <div>
+                  <div className="mb-6">
+                    <h2 className="font-mono text-xl text-retro-gold mb-2 flex items-center">
+                      <Bookmark size={20} className="mr-2" />
+                      Critical Counterpoints
+                    </h2>
+                    <p className="font-mono text-sm text-retro-sand">
+                      These works challenge your perspective and offer important alternative viewpoints.
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    {filteredCriticalBooks.map((book) => (
+                      <PhilosophyBook
+                        key={`critical-${book.id}`}
+                        title={book.title}
+                        author={book.author}
+                        description={book.description}
+                        shortSummary={book.shortSummary}
+                        matchPercentage={book.matchPercentage || 0}
+                        coverImage={book.coverImage}
+                        affiliateLink={book.affiliateLink}
+                        publicDomainLink={book.publicDomainLink}
+                        year={book.year}
+                        philosophy={book.movement}
+                        isPublicDomain={book.isPublicDomain}
+                        era={book.era}
+                        context={book.contextRespondedTo?.join(', ')}
+                      />
+                    ))}
+                  </div>
+                  
+                  {filteredCriticalBooks.length === 0 && (
+                    <div className="text-center p-8 border border-retro-sand/30">
+                      <p className="text-retro-gold font-mono">No contrasting books found with current filter.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             

@@ -1,0 +1,18 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Hammer handle -->
+  <rect x="10" y="6" width="4" height="12" fill="#e8da99"/>
+  <rect x="9" y="5" width="6" height="2" fill="#e8da99"/>
+  <!-- Hammer head -->
+  <rect x="6" y="4" width="8" height="4" fill="#e8da99"/>
+  <rect x="5" y="5" width="2" height="2" fill="#e8da99"/>
+  <rect x="17" y="5" width="2" height="2" fill="#e8da99"/>
+  <!-- Hammer claw -->
+  <rect x="4" y="6" width="2" height="2" fill="#c3b17f"/>
+  <rect x="3" y="7" width="2" height="2" fill="#c3b17f"/>
+  <rect x="18" y="6" width="2" height="2" fill="#c3b17f"/>
+  <rect x="19" y="7" width="2" height="2" fill="#c3b17f"/>
+  <!-- Handle grip -->
+  <rect x="10" y="14" width="4" height="1" fill="#c3b17f"/>
+  <rect x="10" y="16" width="4" height="1" fill="#c3b17f"/>
+  <rect x="10" y="18" width="4" height="1" fill="#c3b17f"/>
+</svg>

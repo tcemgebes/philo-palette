@@ -137,14 +137,14 @@ const Traditions = () => {
               <Button 
                 onClick={() => navigate('/')}
                 variant="outline"
-                className="mb-8 group"
+                className="mb-8 group glass-panel"
               >
                 <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform duration-300" />
                 <span>Back to Home</span>
               </Button>
               
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-mono tracking-wide text-[#e8da99] mb-6">Philosophical Traditions</h1>
-              <p className="text-base md:text-lg leading-relaxed text-[#e8da99]/90 font-mono text-lg">
+              <h1 className="heading-xl mb-6">Philosophical Traditions</h1>
+              <p className="body-text text-lg">
                 Explore the rich diversity of philosophical thought across cultures and centuries. 
                 Each tradition offers unique insights into life's fundamental questions.
               </p>
@@ -159,7 +159,7 @@ const Traditions = () => {
               {traditions.map((tradition) => (
                 <div 
                   key={tradition.id}
-                  className="bg-black/80 backdrop-blur-sm border border-[#c3b17f] shadow-lg p-6 rounded-lg hover:shadow-lg transition-all duration-300 group cursor-pointer"
+                  className="glass-panel p-6 hover:shadow-lg transition-all duration-300 group cursor-pointer"
                 >
                   <div className="flex items-center mb-4">
                     <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${tradition.color} flex items-center justify-center mr-4`}>
@@ -171,7 +171,7 @@ const Traditions = () => {
                     </div>
                   </div>
                   
-                  <p className="text-[#e8da99]/90 mb-4 leading-relaxed">
+                  <p className="body-text mb-4 leading-relaxed">
                     {tradition.description}
                   </p>
                   
@@ -205,14 +205,14 @@ const Traditions = () => {
         <section className="py-16 bg-secondary/30">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="max-w-3xl mx-auto space-y-6">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-mono tracking-wide text-[#e8da99]">Ready to Find Your Philosophical Path?</h2>
-              <p className="text-base md:text-lg leading-relaxed text-[#e8da99]/90 font-mono">
+              <h2 className="heading-xl">Ready to Find Your Philosophical Path?</h2>
+              <p className="body-text text-lg">
                 Discover which philosophical traditions resonate with your unique perspective and challenges.
               </p>
               
               <Button 
                 onClick={() => navigate('/introduction')}
-                className="px-6 py-3 border border-[#c3b17f] bg-transparent text-[#e8da99] hover:bg-[#c3b17f]/20 transition-all duration-300 font-mono uppercase tracking-wider group"
+                className="btn-primary group"
               >
                 <span>Begin Your Journey</span>
                 <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform duration-300" />

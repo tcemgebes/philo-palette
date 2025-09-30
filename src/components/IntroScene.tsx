@@ -8,22 +8,27 @@ import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 const INTRO_SCENES = [
   {
     id: 1,
-    text: "Throughout history, individuals have turned to philosophy to address life's deepest challenges.",
+    text: "You are a mixture of tendencies, attitudes, relations, and potentials.",
     image: "/lovable-uploads/9ff07881-6aa2-49b8-aa4f-0b22115fc5fd.png"
   },
   {
     id: 2,
-    text: "From the Stoics seeking tranquility in chaotic times to Existentialists finding meaning in uncertainty.",
+    text: "You are not the first to navigate this terrain. It has been contemplated and written about by the most prolific thinkers.",
     image: "/lovable-uploads/9ff07881-6aa2-49b8-aa4f-0b22115fc5fd.png"
   },
   {
     id: 3,
-    text: "Philosophy offers us frameworks to understand ourselves and our place in the world.",
+    text: "Likely some have described your problem as their own.",
     image: "/lovable-uploads/9ff07881-6aa2-49b8-aa4f-0b22115fc5fd.png"
   },
   {
     id: 4,
-    text: "Today, we'll help you discover which philosophical perspective resonates with your unique challenges.",
+    text: "The device in your hand is new. The mind holding it is not.",
+    image: "/lovable-uploads/9ff07881-6aa2-49b8-aa4f-0b22115fc5fd.png"
+  },
+  {
+    id: 5,
+    text: "Let's introduce you to the thinker who was writing for you.",
     image: "/lovable-uploads/9ff07881-6aa2-49b8-aa4f-0b22115fc5fd.png"
   }
 ];

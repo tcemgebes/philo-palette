@@ -1,0 +1,13 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pillar base -->
+  <rect x="8" y="18" width="8" height="4" fill="#e8da99"/>
+  <!-- Pillar shaft -->
+  <rect x="9" y="4" width="6" height="14" fill="#e8da99"/>
+  <!-- Pillar capital (top) -->
+  <rect x="7" y="2" width="10" height="2" fill="#e8da99"/>
+  <!-- Pillar details (lines) -->
+  <rect x="9" y="6" width="6" height="1" fill="#c3b17f"/>
+  <rect x="9" y="9" width="6" height="1" fill="#c3b17f"/>
+  <rect x="9" y="12" width="6" height="1" fill="#c3b17f"/>
+  <rect x="9" y="15" width="6" height="1" fill="#c3b17f"/>
+</svg>
